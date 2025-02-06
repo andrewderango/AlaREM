@@ -19,14 +19,13 @@ def compute_power_bands(signal, sfreq):
     
     return power_bands
 
-edf_files = []
-edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-cassette')))
-edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-telemetry')))
-edf_files = [edf_file for edf_file in edf_files if 'Hypnogram' not in edf_file]
-all_power_bands_df = []
+def load_edf_files(edf_files):
+    for edf_file in edf_files:
+        if 'Hypnogram' in edf_file:
+            continue
+        yield edf_file
 
-for edf_file in tqdm(edf_files, desc='Processing Nights'):
-
+def process_edf_file(edf_file):
     if edf_file[1] == 'T':
         raw = mne.io.read_raw_edf(os.path.join('data', 'physionet', 'sleep-telemetry', edf_file), preload=True, verbose=False)
         data_type = 'telemetry'
@@ -49,6 +48,9 @@ for edf_file in tqdm(edf_files, desc='Processing Nights'):
     df['epochNum'] = ((df['time'] - df['time'][0]) // 30).astype(int) # new epoch assigned for every 30 seconds
     df['epochId'] = data_type + '-' + subject_number + '-' + night_number + '-' + df['epochNum'].apply(lambda x: f"{x:04d}")
 
+    return df, sfreq
+
+def compute_power_bands_for_epochs(df, sfreq):
     epochs = df.groupby('epochId')
     power_bands_list = []
 
@@ -66,10 +68,23 @@ for edf_file in tqdm(edf_files, desc='Processing Nights'):
         }
         power_bands_list.append(power_bands)
 
-    power_bands_df = pd.DataFrame(power_bands_list)
-    all_power_bands_df.append(power_bands_df)
+    return pd.DataFrame(power_bands_list)
 
-all_power_bands_df = pd.concat(all_power_bands_df, ignore_index=True)
-all_power_bands_df.to_csv(os.path.join('data', 'physionet', 'frequency_spectrum_data.csv'), index=False)
-print('Data saved to data/physionet/frequency_spectrum_data.csv')
-print(f"File Size: {all_power_bands_df.memory_usage(deep=True).sum() / 1e6:.2f} MB")
+def preprocess_data():
+    edf_files = []
+    edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-cassette')))
+    edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-telemetry')))
+    edf_files = [edf_file for edf_file in edf_files if 'Hypnogram' not in edf_file]
+    all_epochs_power_bands_df = []
+
+    for edf_file in tqdm(load_edf_files(edf_files), desc='Processing Nights'):
+        raw_data_df, sampling_freq = process_edf_file(edf_file)
+        epochs_power_bands_df = compute_power_bands_for_epochs(raw_data_df, sampling_freq)
+        all_epochs_power_bands_df.append(epochs_power_bands_df)
+
+    all_epochs_power_bands_df = pd.concat(all_epochs_power_bands_df, ignore_index=True)
+    all_epochs_power_bands_df.to_csv(os.path.join('data', 'physionet', 'frequency_spectrum_data.csv'), index=False)
+    print('Data saved to data/physionet/frequency_spectrum_data.csv')
+    print(f"File Size: {all_epochs_power_bands_df.memory_usage(deep=True).sum() / 1e6:.2f} MB")
+
+    return all_epochs_power_bands_df
