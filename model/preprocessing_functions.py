@@ -5,8 +5,6 @@ import mne
 edf_files = []
 edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-cassette')))
 edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-telemetry')))
-print(edf_files)
-print(len(edf_files))
 
 for edf_file in edf_files:
     if 'Hypnogram' in edf_file:
@@ -22,4 +20,7 @@ for edf_file in edf_files:
     
     df = raw.to_data_frame()
     df = df[['time', 'EEG Fpz-Cz', 'EEG Pz-Oz']]
+    # add col for personID
+    # add col for nightID
+    # add col for EpochID
     print(df.head())
