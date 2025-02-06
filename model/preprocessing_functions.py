@@ -3,10 +3,6 @@ import mne
 import numpy as np
 import pandas as pd
 
-edf_files = []
-edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-cassette')))
-edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-telemetry')))
-
 def compute_power_bands(signal, sfreq):
     freqs = np.fft.rfftfreq(len(signal), d=1/sfreq)
     fft_vals = np.abs(np.fft.rfft(signal))**2
@@ -19,7 +15,13 @@ def compute_power_bands(signal, sfreq):
         'beta': np.sum(fft_vals[(freqs >= 12) & (freqs < 30)]),
         'gamma': np.sum(fft_vals[(freqs >= 30) & (freqs < 100)])
     }
+    
     return power_bands
+
+edf_files = []
+edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-cassette')))
+edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-telemetry')))
+all_power_bands_df = []
 
 for edf_file in edf_files:
     if 'Hypnogram' in edf_file:
@@ -45,7 +47,7 @@ for edf_file in edf_files:
     df['subject'] = subject_number
     df['night'] = night_number
     df['epochNum'] = ((df['time'] - df['time'][0]) // 30).astype(int) # new epoch assigned for every 30 seconds
-    df['epochId'] = data_type + '-' + subject_number + '-' + night_number + '-' + df['epochNum'].astype(str)
+    df['epochId'] = data_type + '-' + subject_number + '-' + night_number + '-' + df['epochNum'].apply(lambda x: f"{x:04d}")
 
     epochs = df.groupby('epochId')
     power_bands_list = []
@@ -65,5 +67,7 @@ for edf_file in edf_files:
         power_bands_list.append(power_bands)
 
     power_bands_df = pd.DataFrame(power_bands_list)
-    print(power_bands_df)
-    quit()
+    all_power_bands_df.append(power_bands_df)
+
+all_power_bands_df = pd.concat(all_power_bands_df, ignore_index=True)
+print(all_power_bands_df)
