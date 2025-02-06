@@ -27,7 +27,10 @@ for edf_file in edf_files:
     df['type'] = data_type
     df['subject'] = subject_number
     df['night'] = night_number
+    df['epoch'] = ((df['time'] - df['time'][0]) // 30).astype(int) # new epoch assigned for every 30 seconds
+    df['recordId'] = data_type + '-' + subject_number + '-' + night_number + '-' + df['epoch'].astype(str)
 
-    # add col for EpochID
-
-    print(df.head())
+    # print(df.head())
+    print(df[:1000].to_string())
+    print(df.shape[0])
+    quit()
