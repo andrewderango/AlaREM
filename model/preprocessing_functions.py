@@ -3,7 +3,6 @@ import mne
 import numpy as np
 import pandas as pd
 
-# get all files in the data/physionet/sleep-cassette directory
 edf_files = []
 edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-cassette')))
 edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-telemetry')))
@@ -25,7 +24,6 @@ def compute_power_bands(signal, sfreq):
 for edf_file in edf_files:
     if 'Hypnogram' in edf_file:
         continue
-    print(edf_file)
 
     if edf_file[1] == 'T':
         raw = mne.io.read_raw_edf(os.path.join('data', 'physionet', 'sleep-telemetry', edf_file), preload=True, verbose=False)
@@ -50,6 +48,7 @@ for edf_file in edf_files:
     df['epochId'] = data_type + '-' + subject_number + '-' + night_number + '-' + df['epochNum'].astype(str)
 
     epochs = df.groupby('epochId')
+    power_bands_list = []
 
     for epoch_id, epoch_df in epochs:
         eeg_anterior = epoch_df['eegAnterior'].values
@@ -58,11 +57,13 @@ for edf_file in edf_files:
         power_bands_anterior = compute_power_bands(eeg_anterior, sfreq)
         power_bands_posterior = compute_power_bands(eeg_posterior, sfreq)
 
-        print(f"Epoch ID: {epoch_id}")
-        print("Anterior EEG Power Bands:", power_bands_anterior)
-        print("Posterior EEG Power Bands:", power_bands_posterior)
-        print()
+        power_bands = {
+            'epochId': epoch_id,
+            **{f'anterior_{band}': power for band, power in power_bands_anterior.items()},
+            **{f'posterior_{band}': power for band, power in power_bands_posterior.items()}
+        }
+        power_bands_list.append(power_bands)
 
-    print(df[:10].to_string())
-    print(df.shape[0])
+    power_bands_df = pd.DataFrame(power_bands_list)
+    print(power_bands_df)
     quit()
