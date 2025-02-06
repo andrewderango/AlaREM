@@ -70,4 +70,6 @@ for edf_file in tqdm(edf_files, desc='Processing Nights'):
     all_power_bands_df.append(power_bands_df)
 
 all_power_bands_df = pd.concat(all_power_bands_df, ignore_index=True)
-print(all_power_bands_df)
+all_power_bands_df.to_csv(os.path.join('data', 'physionet', 'frequency_spectrum_data.csv'), index=False)
+print('Data saved to data/physionet/frequency_spectrum_data.csv')
+print(f"File Size: {all_power_bands_df.memory_usage(deep=True).sum() / 1e6:.2f} MB")
