@@ -35,7 +35,7 @@ def process_edf_file(edf_file):
     else:
         raise ValueError('Invalid file name')
     
-    sampling_frequency = raw.info['sampling_frequency']
+    sampling_frequency = raw.info['sfreq']
     subject_number = edf_file[3:5]
     night_number = edf_file[5]
     
@@ -79,7 +79,7 @@ def preprocess_data(preprocess_data, download_files):
         edf_files = [edf_file for edf_file in edf_files if 'Hypnogram' not in edf_file]
         all_epochs_power_bands_df = []
 
-        for edf_file in tqdm(load_edf_files(edf_files), desc='Processing Nights'):
+        for edf_file in tqdm(edf_files, desc='Processing Nights'):
             raw_data_df, sampling_freq = process_edf_file(edf_file)
             epochs_power_bands_df = compute_power_bands_for_epochs(raw_data_df, sampling_freq)
             all_epochs_power_bands_df.append(epochs_power_bands_df)
