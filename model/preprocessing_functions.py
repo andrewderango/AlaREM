@@ -2,6 +2,7 @@ import os
 import mne
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 def compute_power_bands(signal, sfreq):
     freqs = np.fft.rfftfreq(len(signal), d=1/sfreq)
@@ -21,11 +22,10 @@ def compute_power_bands(signal, sfreq):
 edf_files = []
 edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-cassette')))
 edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-telemetry')))
+edf_files = [edf_file for edf_file in edf_files if 'Hypnogram' not in edf_file]
 all_power_bands_df = []
 
-for edf_file in edf_files:
-    if 'Hypnogram' in edf_file:
-        continue
+for edf_file in tqdm(edf_files, desc='Processing Nights'):
 
     if edf_file[1] == 'T':
         raw = mne.io.read_raw_edf(os.path.join('data', 'physionet', 'sleep-telemetry', edf_file), preload=True, verbose=False)
