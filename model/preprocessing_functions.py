@@ -8,13 +8,14 @@ def compute_power_bands(signal, sampling_frequency):
     freqs = np.fft.rfftfreq(len(signal), d=1/sampling_frequency)
     fft_vals = np.abs(np.fft.rfft(signal))**2
 
+    total_power = np.sum(fft_vals)
     power_bands = {
-        'subdelta': np.sum(fft_vals[freqs < 0.5]),
-        'delta': np.sum(fft_vals[(freqs >= 0.5) & (freqs < 4)]),
-        'theta': np.sum(fft_vals[(freqs >= 4) & (freqs < 8)]),
-        'alpha': np.sum(fft_vals[(freqs >= 8) & (freqs < 12)]),
-        'beta': np.sum(fft_vals[(freqs >= 12) & (freqs < 30)]),
-        'gamma': np.sum(fft_vals[(freqs >= 30) & (freqs < 100)])
+        'subdelta': round(np.sum(fft_vals[freqs < 0.5]) / total_power, 5),
+        'delta': round(np.sum(fft_vals[(freqs >= 0.5) & (freqs < 4)]) / total_power, 5),
+        'theta': round(np.sum(fft_vals[(freqs >= 4) & (freqs < 8)]) / total_power, 5),
+        'alpha': round(np.sum(fft_vals[(freqs >= 8) & (freqs < 12)]) / total_power, 5),
+        'beta': round(np.sum(fft_vals[(freqs >= 12) & (freqs < 30)]) / total_power, 5),
+        'gamma': round(np.sum(fft_vals[(freqs >= 30)]) / total_power, 5)
     }
     
     return power_bands
