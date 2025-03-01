@@ -80,7 +80,7 @@ def preprocess_features(preprocess_features, download_files):
         edf_files = [edf_file for edf_file in edf_files if 'Hypnogram' not in edf_file]
         all_epochs_power_bands_df = []
 
-        for edf_file in tqdm(edf_files, desc='Processing Nights (Features)'):
+        for edf_file in tqdm(edf_files, desc='Processing Nights (Features)', colour='GREEN'):
             raw_data_df, sampling_freq = process_edf_file(edf_file)
             epochs_power_bands_df = compute_power_bands_for_epochs(raw_data_df, sampling_freq)
             all_epochs_power_bands_df.append(epochs_power_bands_df)
@@ -104,7 +104,7 @@ def preprocess_labels(all_epochs_power_bands_df):
     edfp_files = [edf_file for edf_file in edfp_files if 'Hypnogram' in edf_file]
 
     labels_list = []
-    for edfp_file in tqdm(edfp_files, desc='Processing Nights (Labels)'):
+    for edfp_file in tqdm(edfp_files, desc='Processing Nights (Labels)', colour='GREEN'):
         if edfp_file[1] == 'T':
             raw = mne.read_annotations(os.path.join('data', 'physionet', 'sleep-telemetry', edfp_file))
             data_type = 'telemetry'
@@ -120,7 +120,7 @@ def preprocess_labels(all_epochs_power_bands_df):
             "end": raw.onset + raw.duration,
             "sleep_stage": raw.description
         })
-        annotations_df['sleep_stage'] = annotations_df['sleep_stage'].apply(lambda x: x.split(' ')[-1])
+        annotations_df['sleep_stage'] = annotations_df['sleep_stage'].apply(lambda x: 'M' if x == 'Movement time' else x.split(' ')[-1])
         
         subject_number = edfp_file[3:5]
         night_number = edfp_file[5]
@@ -130,7 +130,7 @@ def preprocess_labels(all_epochs_power_bands_df):
             min_timestamp = epoch * 30
             max_timestamp = (epoch + 1) * 30
             epoch_id = data_type + '-' + subject_number + '-' + night_number + '-' + f"{epoch:04d}"
-            interval_epoch_annotations = annotations_df[(annotations_df['onset'] <= max_timestamp) & (annotations_df['end'] >= min_timestamp)]
+            interval_epoch_annotations = annotations_df[(annotations_df['onset'] < max_timestamp) & (annotations_df['end'] > min_timestamp)]
             if len(interval_epoch_annotations) == 0:
                 sleep_stage = 'N' # no label available
             elif len(interval_epoch_annotations) == 1:
@@ -146,9 +146,7 @@ def preprocess_labels(all_epochs_power_bands_df):
     print(labels_df)
     all_epochs_power_bands_df = all_epochs_power_bands_df.merge(labels_df, on='epochId', how='left')
     print(all_epochs_power_bands_df)
-    print(all_epochs_power_bands_df.describe().T)
     print(all_epochs_power_bands_df['sleep_stage'].value_counts())
-    quit()
 
     # Save the merged dataframe if needed
     all_epochs_power_bands_df.to_csv(os.path.join('data', 'physionet', 'labelled_frequency_spectrum_data.csv'), index=False)
