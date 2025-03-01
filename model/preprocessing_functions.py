@@ -97,59 +97,65 @@ def preprocess_features(preprocess_features, download_files):
 
     return all_epochs_power_bands_df
 
-def preprocess_labels(all_epochs_power_bands_df):
-    edfp_files = []
-    edfp_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-cassette')))
-    edfp_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-telemetry')))
-    edfp_files = [edf_file for edf_file in edfp_files if 'Hypnogram' in edf_file]
+def preprocess_labels(all_epochs_power_bands_df, preprocess_labels, download_files):
 
-    labels_list = []
-    for edfp_file in tqdm(edfp_files, desc='Processing Nights (Labels)', colour='GREEN'):
-        if edfp_file[1] == 'T':
-            raw = mne.read_annotations(os.path.join('data', 'physionet', 'sleep-telemetry', edfp_file))
-            data_type = 'telemetry'
-        elif edfp_file[1] == 'C':
-            raw = mne.read_annotations(os.path.join('data', 'physionet', 'sleep-cassette', edfp_file))
-            data_type = 'cassette'
-        else:
-            raise ValueError('Invalid file name')
+    labelled_epochs_power_bands_df = all_epochs_power_bands_df.copy(deep=True)
 
-        annotations_df = pd.DataFrame({
-            "onset": raw.onset,
-            "duration": raw.duration,
-            "end": raw.onset + raw.duration,
-            "sleep_stage": raw.description
-        })
-        annotations_df['sleep_stage'] = annotations_df['sleep_stage'].apply(lambda x: 'M' if x == 'Movement time' else x.split(' ')[-1])
-        
-        subject_number = edfp_file[3:5]
-        night_number = edfp_file[5]
-        epochs = int((annotations_df.iloc[-1]['onset'] + annotations_df.iloc[-1]['duration']) // 30)
+    if preprocess_labels:
+        edfp_files = []
+        edfp_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-cassette')))
+        edfp_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-telemetry')))
+        edfp_files = [edf_file for edf_file in edfp_files if 'Hypnogram' in edf_file]
 
-        for epoch in range(epochs):
-            min_timestamp = epoch * 30
-            max_timestamp = (epoch + 1) * 30
-            epoch_id = data_type + '-' + subject_number + '-' + night_number + '-' + f"{epoch:04d}"
-            interval_epoch_annotations = annotations_df[(annotations_df['onset'] < max_timestamp) & (annotations_df['end'] > min_timestamp)]
-            if len(interval_epoch_annotations) == 0:
-                sleep_stage = 'N' # no label available
-            elif len(interval_epoch_annotations) == 1:
-                sleep_stage = interval_epoch_annotations.iloc[0]['sleep_stage']
+        labels_list = []
+        for edfp_file in tqdm(edfp_files, desc='Processing Nights (Labels)', colour='GREEN'):
+            if edfp_file[1] == 'T':
+                raw = mne.read_annotations(os.path.join('data', 'physionet', 'sleep-telemetry', edfp_file))
+                data_type = 'telemetry'
+            elif edfp_file[1] == 'C':
+                raw = mne.read_annotations(os.path.join('data', 'physionet', 'sleep-cassette', edfp_file))
+                data_type = 'cassette'
             else:
-                sleep_stage = 'T' # transition epoch
-            labels_list.append({
-                'epochId': epoch_id,
-                'sleep_stage': sleep_stage
-            })
+                raise ValueError('Invalid file name')
 
-    labels_df = pd.DataFrame(labels_list)
-    print(labels_df)
-    all_epochs_power_bands_df = all_epochs_power_bands_df.merge(labels_df, on='epochId', how='left')
-    print(all_epochs_power_bands_df)
-    print(all_epochs_power_bands_df['sleep_stage'].value_counts())
+            annotations_df = pd.DataFrame({
+                "onset": raw.onset,
+                "duration": raw.duration,
+                "end": raw.onset + raw.duration,
+                "sleep_stage": raw.description
+            })
+            annotations_df['sleep_stage'] = annotations_df['sleep_stage'].apply(lambda x: 'M' if x == 'Movement time' else x.split(' ')[-1])
+            
+            subject_number = edfp_file[3:5]
+            night_number = edfp_file[5]
+            epochs = int((annotations_df.iloc[-1]['onset'] + annotations_df.iloc[-1]['duration']) // 30)
+
+            for epoch in range(epochs):
+                min_timestamp = epoch * 30
+                max_timestamp = (epoch + 1) * 30
+                epoch_id = data_type + '-' + subject_number + '-' + night_number + '-' + f"{epoch:04d}"
+                interval_epoch_annotations = annotations_df[(annotations_df['onset'] < max_timestamp) & (annotations_df['end'] > min_timestamp)]
+                if len(interval_epoch_annotations) == 0:
+                    sleep_stage = 'N' # no label available
+                elif len(interval_epoch_annotations) == 1:
+                    sleep_stage = interval_epoch_annotations.iloc[0]['sleep_stage']
+                else:
+                    sleep_stage = 'T' # transition epoch
+                labels_list.append({
+                    'epochId': epoch_id,
+                    'sleep_stage': sleep_stage
+                })
+
+        labels_df = pd.DataFrame(labels_list)
+        labelled_epochs_power_bands_df = labelled_epochs_power_bands_df.merge(labels_df, on='epochId', how='left')
+        labelled_epochs_power_bands_df['sleep_stage'] = labelled_epochs_power_bands_df['sleep_stage'].fillna('N')
+
+    else:
+        labelled_epochs_power_bands_df = pd.read_csv(os.path.join('data', 'physionet', 'labelled_frequency_spectrum_data.csv'))
 
     # Save the merged dataframe if needed
-    all_epochs_power_bands_df.to_csv(os.path.join('data', 'physionet', 'labelled_frequency_spectrum_data.csv'), index=False)
-    print('Data with labels saved to data/physionet/labelled_frequency_spectrum_data.csv')
+    if download_files:
+        labelled_epochs_power_bands_df.to_csv(os.path.join('data', 'physionet', 'labelled_frequency_spectrum_data.csv'), index=False)
+        print('Data with labels saved to data/physionet/labelled_frequency_spectrum_data.csv')
 
-    return all_epochs_power_bands_df
+    return labelled_epochs_power_bands_df
