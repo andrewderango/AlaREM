@@ -97,6 +97,52 @@ def preprocess_features(preprocess_features, download_files):
 
     return all_epochs_power_bands_df
 
+def extract_annotations(edfp_file):
+    if edfp_file[1] == 'T':
+        raw = mne.read_annotations(os.path.join('data', 'physionet', 'sleep-telemetry', edfp_file))
+        data_type = 'telemetry'
+    elif edfp_file[1] == 'C':
+        raw = mne.read_annotations(os.path.join('data', 'physionet', 'sleep-cassette', edfp_file))
+        data_type = 'cassette'
+    else:
+        raise ValueError('Invalid file name')
+
+    annotations_df = pd.DataFrame({
+        "onset": raw.onset,
+        "duration": raw.duration,
+        "end": raw.onset + raw.duration,
+        "sleep_stage": raw.description
+    })
+    annotations_df['sleep_stage'] = annotations_df['sleep_stage'].apply(lambda x: 'M' if x == 'Movement time' else x.split(' ')[-1])
+    
+    subject_number = edfp_file[3:5]
+    night_number = edfp_file[5]
+    annotations_df['epochId'] = annotations_df.apply(lambda row: f"{data_type}-{subject_number}-{night_number}-{int(row['onset'] // 30):04d}", axis=1)
+    
+    return annotations_df, data_type, subject_number, night_number
+
+def generate_labels(annotations_df, data_type, subject_number, night_number):
+    labels_list = []
+    epochs = int((annotations_df.iloc[-1]['onset'] + annotations_df.iloc[-1]['duration']) // 30)
+
+    for epoch in range(epochs):
+        min_timestamp = epoch * 30
+        max_timestamp = (epoch + 1) * 30
+        epoch_id = f"{data_type}-{subject_number}-{night_number}-{epoch:04d}"
+        interval_epoch_annotations = annotations_df[(annotations_df['onset'] < max_timestamp) & (annotations_df['end'] > min_timestamp)]
+        if len(interval_epoch_annotations) == 0:
+            sleep_stage = 'N' # no label available
+        elif len(interval_epoch_annotations) == 1:
+            sleep_stage = interval_epoch_annotations.iloc[0]['sleep_stage']
+        else:
+            sleep_stage = 'T' # transition epoch
+        labels_list.append({
+            'epochId': epoch_id,
+            'sleep_stage': sleep_stage
+        })
+
+    return labels_list
+
 def preprocess_labels(all_epochs_power_bands_df, preprocess_labels, download_files):
 
     labelled_epochs_power_bands_df = all_epochs_power_bands_df.copy(deep=True)
@@ -109,42 +155,8 @@ def preprocess_labels(all_epochs_power_bands_df, preprocess_labels, download_fil
 
         labels_list = []
         for edfp_file in tqdm(edfp_files, desc='Processing Nights (Labels)', colour='GREEN'):
-            if edfp_file[1] == 'T':
-                raw = mne.read_annotations(os.path.join('data', 'physionet', 'sleep-telemetry', edfp_file))
-                data_type = 'telemetry'
-            elif edfp_file[1] == 'C':
-                raw = mne.read_annotations(os.path.join('data', 'physionet', 'sleep-cassette', edfp_file))
-                data_type = 'cassette'
-            else:
-                raise ValueError('Invalid file name')
-
-            annotations_df = pd.DataFrame({
-                "onset": raw.onset,
-                "duration": raw.duration,
-                "end": raw.onset + raw.duration,
-                "sleep_stage": raw.description
-            })
-            annotations_df['sleep_stage'] = annotations_df['sleep_stage'].apply(lambda x: 'M' if x == 'Movement time' else x.split(' ')[-1])
-            
-            subject_number = edfp_file[3:5]
-            night_number = edfp_file[5]
-            epochs = int((annotations_df.iloc[-1]['onset'] + annotations_df.iloc[-1]['duration']) // 30)
-
-            for epoch in range(epochs):
-                min_timestamp = epoch * 30
-                max_timestamp = (epoch + 1) * 30
-                epoch_id = data_type + '-' + subject_number + '-' + night_number + '-' + f"{epoch:04d}"
-                interval_epoch_annotations = annotations_df[(annotations_df['onset'] < max_timestamp) & (annotations_df['end'] > min_timestamp)]
-                if len(interval_epoch_annotations) == 0:
-                    sleep_stage = 'N' # no label available
-                elif len(interval_epoch_annotations) == 1:
-                    sleep_stage = interval_epoch_annotations.iloc[0]['sleep_stage']
-                else:
-                    sleep_stage = 'T' # transition epoch
-                labels_list.append({
-                    'epochId': epoch_id,
-                    'sleep_stage': sleep_stage
-                })
+            annotations_df, data_type, subject_number, night_number = extract_annotations(edfp_file)
+            labels_list.extend(generate_labels(annotations_df, data_type, subject_number, night_number))
 
         labels_df = pd.DataFrame(labels_list)
         labelled_epochs_power_bands_df = labelled_epochs_power_bands_df.merge(labels_df, on='epochId', how='left')
