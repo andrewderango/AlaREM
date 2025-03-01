@@ -1,7 +1,10 @@
 from preprocessing_functions import *
 
 def main():
-    all_epochs_power_bands_df = preprocess_data(preprocess_data=True, download_files=True)
+    all_epochs_power_bands_df = preprocess_features(preprocess_features=False, download_files=False)
+
+    print(all_epochs_power_bands_df)
+    print(all_epochs_power_bands_df.describe().T)
 
     return
 

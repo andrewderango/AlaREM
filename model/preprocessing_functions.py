@@ -71,9 +71,9 @@ def compute_power_bands_for_epochs(df, sampling_frequency):
 
     return pd.DataFrame(power_bands_list)
 
-def preprocess_data(preprocess_data, download_files):
+def preprocess_features(preprocess_features, download_files):
 
-    if preprocess_data:
+    if preprocess_features:
         edf_files = []
         edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-cassette')))
         edf_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-telemetry')))
@@ -92,7 +92,7 @@ def preprocess_data(preprocess_data, download_files):
             print('Data saved to data/physionet/frequency_spectrum_data.csv')
             print(f"File Size: {all_epochs_power_bands_df.memory_usage(deep=True).sum() / 1e6:.2f} MB")
 
-        else:
-            all_epochs_power_bands_df = pd.read_csv(os.path.join('data', 'physionet', 'frequency_spectrum_data.csv'))
+    else:
+        all_epochs_power_bands_df = pd.read_csv(os.path.join('data', 'physionet', 'frequency_spectrum_data.csv'))
 
     return all_epochs_power_bands_df
