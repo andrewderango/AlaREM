@@ -80,7 +80,7 @@ def preprocess_features(preprocess_features, download_files):
         edf_files = [edf_file for edf_file in edf_files if 'Hypnogram' not in edf_file]
         all_epochs_power_bands_df = []
 
-        for edf_file in tqdm(edf_files, desc='Processing Nights'):
+        for edf_file in tqdm(edf_files, desc='Processing Nights (Features)'):
             raw_data_df, sampling_freq = process_edf_file(edf_file)
             epochs_power_bands_df = compute_power_bands_for_epochs(raw_data_df, sampling_freq)
             all_epochs_power_bands_df.append(epochs_power_bands_df)
@@ -96,3 +96,35 @@ def preprocess_features(preprocess_features, download_files):
         all_epochs_power_bands_df = pd.read_csv(os.path.join('data', 'physionet', 'frequency_spectrum_data.csv'))
 
     return all_epochs_power_bands_df
+
+def preprocess_labels(all_epochs_power_bands_df):
+    edfp_files = []
+    edfp_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-cassette')))
+    edfp_files.extend(os.listdir(os.path.join('data', 'physionet', 'sleep-telemetry')))
+    edfp_files = [edf_file for edf_file in edfp_files if 'Hypnogram' in edf_file]
+
+    for edfp_file in tqdm(edfp_files, desc='Processing Nights (Labels)'):
+
+        if edfp_file[1] == 'T':
+            raw = mne.read_annotations(os.path.join('data', 'physionet', 'sleep-telemetry', edfp_file))
+            data_type = 'telemetry'
+        elif edfp_file[1] == 'C':
+            raw = mne.read_annotations(os.path.join('data', 'physionet', 'sleep-cassette', edfp_file))
+            data_type = 'cassette'
+        else:
+            raise ValueError('Invalid file name')
+
+        annotations_df = pd.DataFrame({
+            "onset": raw.onset,
+            "duration": raw.duration,
+            "sleep_stage": raw.description
+        })
+        annotations_df['sleep_stage'] = annotations_df['sleep_stage'].apply(lambda x: x.split(' ')[-1])
+        # print(annotations_df)
+        # quit()
+
+    print(edfp_files)
+    print(len(edfp_files))
+    quit()
+
+    return
