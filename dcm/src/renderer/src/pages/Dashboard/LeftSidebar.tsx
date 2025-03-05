@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import HideEgramData from '../../components/HideEgram/HideEgram'
 import LogoutButton from '../../components/LogOut/LogOut'
-import ConnectButton from '../../components/ConnectButton/ConnectButton'
 import useStore from '@renderer/store/mainStore'
-import heartflowLogo from '../../assets/heartflow.png'
-import { Cable, Unplug, RefreshCcw } from 'lucide-react'
+import { useToast } from '../../context/ToastContext'
+import alaremLogo from '../../assets/alarem.png'
+import { Activity, XCircle } from 'lucide-react'
 
 interface LeftSidebarProps {
   handleEgramHiding: () => void
 }
 
 const LeftSidebar: React.FC<LeftSidebarProps> = ({ handleEgramHiding }) => {
-  const { username, serialNumber, connectionStatus } = useStore()
+  const { username, serialNumber, connectionStatus, telemetryStatus } = useStore()
+  const { addToast } = useToast()
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [beeping, setBeeping] = useState(false)
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -23,29 +23,23 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ handleEgramHiding }) => {
   }, [])
 
   const getStatusIcon = (): JSX.Element => {
-    if (connectionStatus === 'CONNECTED') {
-      return <Cable size={20} className="activity-icon" />
-    } else if (connectionStatus === 'DISCONNECTED') {
-      return <Unplug size={20} className="activity-icon" />
-    } else {
-      return <RefreshCcw size={20} className="acitivity-icon" />
-    }
+    return connectionStatus === 'CONNECTED' ? (
+      <Activity size={16} className="activity-icon" />
+    ) : (
+      <XCircle size={16} className="disconnected-icon" />
+    )
   }
 
   const getStatusClass = (): string => {
-    if (connectionStatus === 'CONNECTED') {
-      return 'communication-status'
-    } else if (connectionStatus === 'DISCONNECTED') {
-      return 'communication-status disconnected'
-    } else {
-      return 'communication-status reconnecting'
-    }
+    return connectionStatus === 'CONNECTED'
+      ? 'communication-status'
+      : 'communication-status disconnected'
   }
 
   return (
     <div className="sidebar">
       {/* Logo */}
-      <img alt="logo" className="logo-sidebar" src={heartflowLogo} />
+      <img alt="logo" className="logo-sidebar" src={alaremLogo} />
 
       {/* Welcome Section */}
       <div className="welcome-section">
@@ -84,11 +78,8 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ handleEgramHiding }) => {
       {/* Bottom Sidebar Components */}
       <div className="bottom-sidebar-components">
         <div className="sidebar-versions">
-          <p>HeartFlow Release: v2.0.0</p>
+          <p>AlaREM Release: v1.0.0</p>
           {serialNumber && <p>Serial Number: {serialNumber}</p>}
-        </div>
-        <div className="connect-button-container">
-          <ConnectButton />
         </div>
         <div className="egram-button-container">
           <HideEgramData />

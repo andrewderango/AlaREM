@@ -34,7 +34,6 @@ interface PacemakerState {
       ventricularRefractoryPeriod: number
       lowerRateLimit: number
       upperRateLimit: number
-      ventricularSenstivity: number
     }
     AAI: {
       atrialAmplitude: number
@@ -42,7 +41,6 @@ interface PacemakerState {
       atrialRefractoryPeriod: number
       lowerRateLimit: number
       upperRateLimit: number
-      atrialSensitivity: number
     }
     DDDR: {
       atrialAmplitude: number
@@ -57,8 +55,6 @@ interface PacemakerState {
       reactionTime: number
       recoveryTime: number
       avDelay: number
-      atrialSensitivity: number
-      ventricularSensitivity: number
     }
     DDD: {
       atrialAmplitude: number
@@ -70,8 +66,6 @@ interface PacemakerState {
       lowerRateLimit: number
       upperRateLimit: number
       avDelay: number
-      atrialSensitivity: number
-      ventricularSensitivity: number
     }
     AOOR: {
       atrialAmplitude: number
@@ -92,7 +86,6 @@ interface PacemakerState {
       rateFactor: number
       reactionTime: number
       recoveryTime: number
-      atrialSensitivity: number
     }
     VOOR: {
       ventricularAmplitude: number
@@ -113,7 +106,6 @@ interface PacemakerState {
       rateFactor: number
       reactionTime: number
       recoveryTime: number
-      ventricularSenstivity: number
     }
   }
   telemetry: {
@@ -225,7 +217,6 @@ const useStore = create<
       atrialRefractoryPeriod: 0,
       lowerRateLimit: 0,
       upperRateLimit: 0,
-      atrialSensitivity: 0,
     },
     DDDR: {
       atrialAmplitude: 0,
@@ -240,8 +231,6 @@ const useStore = create<
       reactionTime: 0,
       recoveryTime: 0,
       avDelay: 0,
-      atrialSensitivity: 0,
-      ventricularSensitivity: 0,
     },
     DDD: {
       atrialAmplitude: 0,
@@ -253,8 +242,6 @@ const useStore = create<
       lowerRateLimit: 0,
       upperRateLimit: 0,
       avDelay: 0,
-      atrialSensitivity: 0,
-      ventricularSensitivity: 0,
     },
     AOOR: {
       atrialAmplitude: 0,
@@ -275,7 +262,6 @@ const useStore = create<
       rateFactor: 0,
       reactionTime: 0,
       recoveryTime: 0,
-      atrialSensitivity: 0,
     },
     VOOR: {
       ventricularAmplitude: 0,
@@ -296,11 +282,10 @@ const useStore = create<
       rateFactor: 0,
       reactionTime: 0,
       recoveryTime: 0,
-      ventricularSenstivity: 0,
     },
   },
   telemetry: {
-    heartRate: 0,
+    heartRate: 60,
   },
   connectionStatus: 'DISCONNECTED',
   telemetryStatus: 'OFF',

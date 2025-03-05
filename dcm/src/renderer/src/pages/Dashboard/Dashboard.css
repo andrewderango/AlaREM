@@ -67,6 +67,7 @@
   height: auto;
   padding: 10px;
   animation: realisticBeat 2s infinite;
+  margin-bottom: 32.5px !important;
 }
 
 .pacemaker-heart-stop {
@@ -75,7 +76,17 @@
   width: 550px;
   height: auto;
   padding: 10px;
+  animation: realisticBeat 2s infinite;
+  margin-bottom: 32.5px !important;
 }
+
+/* .pacemaker-heart-stop {
+  display: block;
+  margin: 41.75px auto;
+  width: 550px;
+  height: auto;
+  padding: 10px;
+} */
 
 .sidebar {
   width: 20%;
@@ -127,9 +138,7 @@
   padding: 10px;
   cursor: pointer;
   border-radius: 5px 0 0 5px;
-  transition:
-    background 0.3s,
-    right 0.3s;
+  transition: background 0.3s, right 0.3s;
   z-index: 1000;
 }
 
@@ -264,18 +273,6 @@ hr {
   gap: 5px;
 }
 
-.reconnecting {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 0, 0.3);
-  padding: 5px;
-  width: 75%;
-  margin-left: 12.5%;
-  font-size: 14px;
-  gap: 5px;
-}
-
 .disconnected-icon {
   margin-right: 5px;
   margin-left: -2.5px;
@@ -320,8 +317,7 @@ hr {
 }
 
 .logout-button-container,
-.egram-button-container,
-.connection-button-container {
+.egram-button-container {
   width: 100%;
   display: flex;
   justify-content: center;
@@ -411,7 +407,7 @@ hr {
   color: rgba(255, 255, 255, 0.125);
 }
 
-.input-field[type='range'] {
+.input-field[type="range"] {
   -webkit-appearance: none;
   width: 100%;
   height: 4px;
@@ -421,7 +417,7 @@ hr {
   transition: background 0.3s;
 }
 
-.input-field[type='range']::-webkit-slider-thumb {
+.input-field[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 20px;
@@ -432,14 +428,14 @@ hr {
   transition: background 0.3s;
 }
 
-.input-field[type='range']:disabled {
+.input-field[type="range"]:disabled {
   background: rgba(255, 255, 255, 0.025);
   cursor: not-allowed;
 }
 
-.input-field[type='range']:disabled::-webkit-slider-thumb {
+.input-field[type="range"]:disabled::-webkit-slider-thumb {
   background: rgba(255, 255, 255, 0.15);
-  cursor: not-allowed;
+  cursor: not-allowed
 }
 
 .slider-value {
@@ -450,13 +446,13 @@ hr {
   color: rgba(255, 255, 255, 0.7);
 }
 
-input[type='number']::-webkit-outer-spin-button,
-input[type='number']::-webkit-inner-spin-button {
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-input[type='number'] {
+input[type="number"] {
   -moz-appearance: textfield;
 }
 
@@ -554,11 +550,6 @@ input:focus + label {
   width: 100%;
 }
 
-.submit-button:disabled {
-  background: rgba(27, 27, 31, 0.5);
-  cursor: not-allowed;
-}
-
 .discard-button {
   background: rgba(27, 27, 31, 0.85);
   border-radius: 5px;
@@ -607,10 +598,6 @@ h3 {
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
 }
 
-.electrogram-container * {
-  pointer-events: all !important;
-}
-
 .electrogram {
   margin-top: 15px;
 }
@@ -618,19 +605,17 @@ h3 {
 .stats-container {
   display: flex;
   justify-content: space-around;
-  margin-top: 35px;
+  margin-top: 26px;
 }
 
 .stat-box {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
-  border: 2px solid transparent;
   padding: 20px;
   text-align: center;
   color: white;
   width: 30%;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-  transition: border-color 0.3s;
 }
 
 .stat-box h3 {
@@ -643,34 +628,6 @@ h3 {
 .stat-box p {
   font-size: 32px;
   font-weight: bold;
-}
-
-@keyframes yellow-flash {
-  0%,
-  100% {
-    border-color: rgba(255, 255, 0, 0.3);
-  }
-  50% {
-    border-color: rgba(255, 255, 0, 0.6);
-  }
-}
-
-@keyframes red-flash {
-  0%,
-  100% {
-    border-color: rgba(255, 0, 0, 0.3);
-  }
-  50% {
-    border-color: rgba(255, 0, 0, 0.6);
-  }
-}
-
-.stat-box.warning {
-  animation: yellow-flash 1s infinite;
-}
-
-.stat-box.critical {
-  animation: red-flash 1s infinite;
 }
 
 .view-toggle {
@@ -852,7 +809,7 @@ h3 {
   height: 100%;
   background-size: cover;
   background-position: center;
-  opacity: 0.1;
+  opacity: 0.10;
   z-index: 0;
   border-radius: 5px;
 }
@@ -880,7 +837,7 @@ h3 {
   transform: translateX(-50%);
   font-size: 24px;
   font-weight: bold;
-  color: rgba(255, 255, 255, 1);
+  color: rgba(255, 255, 255, 1.0);
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
   z-index: 1;
   white-space: nowrap;

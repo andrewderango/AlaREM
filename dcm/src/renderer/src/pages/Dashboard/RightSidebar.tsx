@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Info, HardDriveUpload, ClipboardX, Menu, HeartPulse, FileText } from 'lucide-react'
+import { is } from '@electron-toolkit/utils'
 import { useToast } from '../../context/ToastContext'
-import useStore from '@renderer/store/mainStore'
-import { SerialConnectionResponse } from 'src/common/types'
 
 interface RightSidebarProps {
   showHelp: boolean
@@ -29,8 +28,6 @@ interface RightSidebarProps {
   ventriclePWError: boolean
   atrialRPError: boolean
   ventricleRPError: boolean
-  atrialSensError: boolean
-  ventricularSensError: boolean
   lowerRateLimitError: boolean
   upperRateLimitError: boolean
   rateFactorError: boolean
@@ -40,8 +37,6 @@ interface RightSidebarProps {
   avDelayError: boolean
   isAtriumDisabled: boolean
   isVentricleDisabled: boolean
-  isAtrialSensDisabled: boolean
-  isVentricularSensDisabled: boolean
   isRateFactorDisabled: boolean
   isAvDelayDisabled: boolean
   isRateLimitDisabled: boolean
@@ -68,7 +63,6 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   showHelp,
   handleModeSelect,
   handleInputChange,
-  handleSubmit,
   handleDiscard,
   atriumAmpError,
   ventricleAmpError,
@@ -76,8 +70,6 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   ventriclePWError,
   atrialRPError,
   ventricleRPError,
-  atrialSensError,
-  ventricularSensError,
   lowerRateLimitError,
   upperRateLimitError,
   rateFactorError,
@@ -87,8 +79,6 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   avDelayError,
   isAtriumDisabled,
   isVentricleDisabled,
-  isAtrialSensDisabled,
-  isVentricularSensDisabled,
   isRateFactorDisabled,
   isAvDelayDisabled,
   isRateLimitDisabled,
@@ -97,60 +87,32 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   modes,
   isVisible,
   username,
+  handleSubmit,
 }) => {
   const [view, setView] = useState<'PARAMETERS' | 'REPORTS'>('PARAMETERS')
   const [menuOpen, setMenuOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
-  const [activityThreshold, setActivityThreshold] = useState(
-    modes[currentMode]?.activityThreshold ?? 1,
-  )
-  const [disableSubmit, setDisableSubmit] = useState(false)
+  const [activityThreshold, setActivityThreshold] = useState(modes[currentMode]?.activityThreshold ?? 1)
+  const [submitCount, setSubmitCount] = useState(0)
   const menuRef = useRef<HTMLDivElement>(null)
   const helpRef = useRef<HTMLDivElement>(null)
-  const { connectionStatus } = useStore()
   const { addToast } = useToast()
 
-  window.api.onSerialConnectionMessage((message: SerialConnectionResponse) => {
-    if (message.type === 'connection') {
-      if (message.connectionType === 'initialize' && message.status === 'success') {
-        setDisableSubmit(false)
-      } else if (message.connectionType === 'initialize' && message.status === 'failed') {
-        setDisableSubmit(true)
-      } else if (message.connectionType === 'reconnect' && message.status === 'reconnecting') {
-        setDisableSubmit(true)
-      } else if (message.connectionType === 'reconnect' && message.status === 'success') {
-        setDisableSubmit(false)
-      }
-    }
-  })
-
-  useEffect(() => {
-    if (connectionStatus === 'CONNECTED') {
-      setDisableSubmit(false)
-    } else if (connectionStatus === 'DISCONNECTED') {
-      setDisableSubmit(true)
-    } else if (connectionStatus === 'RECONNECTING') {
-      setDisableSubmit(true)
-    }
-  }, [setDisableSubmit, connectionStatus])
-
   const inputInfo = {
-    atriumAmp: { name: 'Atrium Amplitude', range: '0.5 - 5 V' },
-    ventricleAmp: { name: 'Ventricle Amplitude', range: '0.5 - 5 V' },
-    atrialPW: { name: 'Atrial Pulse Width', range: '1 - 30 ms' },
-    ventriclePW: { name: 'Ventricular Pulse Width', range: '1 - 30 ms' },
+    atriumAmp: { name: 'Atrium Amplitude', range: '0.5 - 10 mV' },
+    ventricleAmp: { name: 'Ventricle Amplitude', range: '0.5 - 25 mV' },
+    atrialPW: { name: 'Atrial Pulse Width', range: '0.05 - 1.9 ms' },
+    ventriclePW: { name: 'Ventricular Pulse Width', range: '0.05 - 1.9 ms' },
     atrialRP: { name: 'Atrial Refractory Period', range: '150 - 500 ms' },
     ventricleRP: { name: 'Ventricular Refractory Period', range: '150 - 500 ms' },
-    atrialSensitivity: { name: 'Atrial Sensitivity', range: '0 - 5 V' },
-    ventricularSensitivity: { name: 'Ventricular Sensitivity', range: '0 - 5 V' },
     lowerRateLimit: { name: 'Lower Rate Limit', range: '30 - 175 bpm' },
     upperRateLimit: { name: 'Upper Rate Limit', range: '50 - 175 bpm' },
     rateFactor: { name: 'Rate Factor', range: '1 - 16' },
-    reactionTime: { name: 'Reaction Time', range: '1 - 50 s' },
-    recoveryTime: { name: 'Recovery Time', range: '1 - 240 s' },
+    reactionTime: { name: 'Reaction Time', range: '10 - 50 s' },
+    recoveryTime: { name: 'Recovery Time', range: '10 - 240 s' },
     activityThreshold: { name: 'Activity Threshold', range: '1 - 7' },
     avDelay: { name: 'Atrioventricular Delay', range: '30 - 300 ms' },
-  }
+  };
 
   const handleClickOutside = (event: MouseEvent) => {
     if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -177,15 +139,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
         input.classList.remove('filled')
       }
     })
-  }, [
-    isAtriumDisabled,
-    isVentricleDisabled,
-    isAvDelayDisabled,
-    isRateFactorDisabled,
-    isRateLimitDisabled,
-    isAtrialSensDisabled,
-    isVentricularSensDisabled,
-  ])
+  }, [isAtriumDisabled, isVentricleDisabled, isAvDelayDisabled, isRateFactorDisabled, isRateLimitDisabled])
 
   useEffect(() => {
     if (view === 'PARAMETERS') {
@@ -201,8 +155,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   }, [view])
 
   useEffect(() => {
-    setActivityThreshold(modes[currentMode]?.activityThreshold ?? 1)
-  }, [currentMode, modes])
+    setActivityThreshold(modes[currentMode]?.activityThreshold ?? 1);
+  }, [currentMode, modes]);
 
   const handleViewChange = (newView: 'PARAMETERS' | 'REPORTS') => {
     setView(newView)
@@ -216,7 +170,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     'Medium High',
     'High',
     'Very High',
-  ]
+  ];
 
   const downloadParameterLog = async () => {
     if (!username) {
@@ -314,7 +268,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           </div>
 
           <div className="header-with-help">
-            <h3>Continuous Parameters</h3>
+            <h3>Pacing Parameters</h3>
             {/* <button className="help-button" onClick={() => setHelpOpen(!helpOpen)}>
               <Info size={14} />
             </button> */}
@@ -328,10 +282,10 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 </div>
                 <ul>
                   <li>
-                    <strong>Atrium Amp:</strong> Amplitude of the atrial pulse (V)
+                    <strong>Atrium Amp:</strong> Amplitude of the atrial pulse (mV)
                   </li>
                   <li>
-                    <strong>Ventricle Amp:</strong> Amplitude of the ventricular pulse (V)
+                    <strong>Ventricle Amp:</strong> Amplitude of the ventricular pulse (mV)
                   </li>
                   <li>
                     <strong>Atrial PW:</strong> Pulse width of the atrial pulse (ms)
@@ -355,9 +309,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               </div>
             )}
             <div className="input-row">
-              <div
-                className={`input-container double ${lowerRateLimitError ? 'validation-error' : ''}`}
-              >
+              <div className={`input-container double ${lowerRateLimitError ? 'validation-error' : ''}`}>
                 <input
                   type="number"
                   className="input-field"
@@ -370,17 +322,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                   Lower Rate Limit
                 </label>
                 {!isRateLimitDisabled && (
-                  <button
-                    className="info-button"
-                    data-title={`${inputInfo.lowerRateLimit.name}: ${inputInfo.lowerRateLimit.range}`}
-                  >
+                  <button className="info-button" data-title={`${inputInfo.lowerRateLimit.name}: ${inputInfo.lowerRateLimit.range}`}>
                     <Info size={12} />
                   </button>
                 )}
               </div>
-              <div
-                className={`input-container double ${upperRateLimitError ? 'validation-error' : ''}`}
-              >
+              <div className={`input-container double ${upperRateLimitError ? 'validation-error' : ''}`}>
                 <input
                   type="number"
                   className="input-field"
@@ -393,17 +340,14 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                   Upper Rate Limit
                 </label>
                 {!isRateLimitDisabled && (
-                  <button
-                    className="info-button"
-                    data-title={`${inputInfo.upperRateLimit.name}: ${inputInfo.upperRateLimit.range}`}
-                  >
+                  <button className="info-button" data-title={`${inputInfo.upperRateLimit.name}: ${inputInfo.upperRateLimit.range}`}>
                     <Info size={12} />
                   </button>
                 )}
               </div>
             </div>
             <div className="input-row">
-              <div className={`input-container quad ${atriumAmpError ? 'validation-error' : ''}`}>
+              <div className={`input-container triple ${atriumAmpError ? 'validation-error' : ''}`}>
                 <input
                   type="number"
                   className="input-field"
@@ -414,15 +358,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 />
                 <label className={isAtriumDisabled ? 'disabled-label' : ''}>AAMP</label>
                 {!isAtriumDisabled && (
-                  <button
-                    className="info-button"
-                    data-title={`${inputInfo.atriumAmp.name}: ${inputInfo.atriumAmp.range}`}
-                  >
+                  <button className="info-button" data-title={`${inputInfo.atriumAmp.name}: ${inputInfo.atriumAmp.range}`}>
                     <Info size={12} />
                   </button>
                 )}
               </div>
-              <div className={`input-container quad ${atrialPWError ? 'validation-error' : ''}`}>
+              <div className={`input-container triple ${atrialPWError ? 'validation-error' : ''}`}>
                 <input
                   type="number"
                   className="input-field"
@@ -433,15 +374,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 />
                 <label className={isAtriumDisabled ? 'disabled-label' : ''}>APW</label>
                 {!isAtriumDisabled && (
-                  <button
-                    className="info-button"
-                    data-title={`${inputInfo.atrialPW.name}: ${inputInfo.atrialPW.range}`}
-                  >
+                  <button className="info-button" data-title={`${inputInfo.atrialPW.name}: ${inputInfo.atrialPW.range}`}>
                     <Info size={12} />
                   </button>
                 )}
               </div>
-              <div className={`input-container quad ${atrialRPError ? 'validation-error' : ''}`}>
+              <div className={`input-container triple ${atrialRPError ? 'validation-error' : ''}`}>
                 <input
                   type="number"
                   className="input-field"
@@ -452,38 +390,14 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 />
                 <label className={isAtriumDisabled ? 'disabled-label' : ''}>ARP</label>
                 {!isAtriumDisabled && (
-                  <button
-                    className="info-button"
-                    data-title={`${inputInfo.atrialRP.name}: ${inputInfo.atrialRP.range}`}
-                  >
-                    <Info size={12} />
-                  </button>
-                )}
-              </div>
-              <div className={`input-container quad ${atrialSensError ? 'validation-error' : ''}`}>
-                <input
-                  type="number"
-                  className="input-field"
-                  onChange={handleInputChange}
-                  disabled={isAtrialSensDisabled}
-                  value={isAtrialSensDisabled ? '' : (modes[currentMode]?.atrialSensitivity ?? '')}
-                  name="atrialSens"
-                />
-                <label className={isAtrialSensDisabled ? 'disabled-label' : ''}>ASN</label>
-                {!isAtrialSensDisabled && (
-                  <button
-                    className="info-button"
-                    data-title={`${inputInfo.atrialSensitivity.name}: ${inputInfo.atrialSensitivity.range}`}
-                  >
+                  <button className="info-button" data-title={`${inputInfo.atrialRP.name}: ${inputInfo.atrialRP.range}`}>
                     <Info size={12} />
                   </button>
                 )}
               </div>
             </div>
             <div className="input-row">
-              <div
-                className={`input-container quad ${ventricleAmpError ? 'validation-error' : ''}`}
-              >
+              <div className={`input-container triple ${ventricleAmpError ? 'validation-error' : ''}`}>
                 <input
                   type="number"
                   className="input-field"
@@ -496,15 +410,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 />
                 <label className={isVentricleDisabled ? 'disabled-label' : ''}>VAMP</label>
                 {!isVentricleDisabled && (
-                  <button
-                    className="info-button"
-                    data-title={`${inputInfo.ventricleAmp.name}: ${inputInfo.ventricleAmp.range}`}
-                  >
+                  <button className="info-button" data-title={`${inputInfo.ventricleAmp.name}: ${inputInfo.ventricleAmp.range}`}>
                     <Info size={12} />
                   </button>
                 )}
               </div>
-              <div className={`input-container quad ${ventriclePWError ? 'validation-error' : ''}`}>
+              <div className={`input-container triple ${ventriclePWError ? 'validation-error' : ''}`}>
                 <input
                   type="number"
                   className="input-field"
@@ -517,15 +428,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 />
                 <label className={isVentricleDisabled ? 'disabled-label' : ''}>VPW</label>
                 {!isVentricleDisabled && (
-                  <button
-                    className="info-button"
-                    data-title={`${inputInfo.ventriclePW.name}: ${inputInfo.ventriclePW.range}`}
-                  >
+                  <button className="info-button" data-title={`${inputInfo.ventriclePW.name}: ${inputInfo.ventriclePW.range}`}>
                     <Info size={12} />
                   </button>
                 )}
               </div>
-              <div className={`input-container quad ${ventricleRPError ? 'validation-error' : ''}`}>
+              <div className={`input-container triple ${ventricleRPError ? 'validation-error' : ''}`}>
                 <input
                   type="number"
                   className="input-field"
@@ -540,44 +448,14 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 />
                 <label className={isVentricleDisabled ? 'disabled-label' : ''}>VRP</label>
                 {!isVentricleDisabled && (
-                  <button
-                    className="info-button"
-                    data-title={`${inputInfo.ventricleRP.name}: ${inputInfo.ventricleRP.range}`}
-                  >
-                    <Info size={12} />
-                  </button>
-                )}
-              </div>
-              <div
-                className={`input-container quad ${ventricularSensError ? 'validation-error' : ''}`}
-              >
-                <input
-                  type="number"
-                  className="input-field"
-                  onChange={handleInputChange}
-                  disabled={isVentricularSensDisabled}
-                  value={
-                    isVentricularSensDisabled
-                      ? ''
-                      : (modes[currentMode]?.ventricularSensitivity ?? '')
-                  }
-                  name="ventricularSens"
-                />
-                <label className={isVentricularSensDisabled ? 'disabled-label' : ''}>VSN</label>
-                {!isVentricularSensDisabled && (
-                  <button
-                    className="info-button"
-                    data-title={`${inputInfo.ventricularSensitivity.name}: ${inputInfo.ventricularSensitivity.range}`}
-                  >
+                  <button className="info-button" data-title={`${inputInfo.ventricleRP.name}: ${inputInfo.ventricleRP.range}`}>
                     <Info size={12} />
                   </button>
                 )}
               </div>
             </div>
             <div className="input-row">
-              <div
-                className={`input-container quad ${reactionTimeError ? 'validation-error' : ''}`}
-              >
+              <div className={`input-container quad ${reactionTimeError ? 'validation-error' : ''}`}>
                 <input
                   type="number"
                   className="input-field"
@@ -588,17 +466,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 />
                 <label className={isRateFactorDisabled ? 'disabled-label' : ''}>RXNT</label>
                 {!isRateFactorDisabled && (
-                  <button
-                    className="info-button"
-                    data-title={`${inputInfo.reactionTime.name}: ${inputInfo.reactionTime.range}`}
-                  >
+                  <button className="info-button" data-title={`${inputInfo.reactionTime.name}: ${inputInfo.reactionTime.range}`}>
                     <Info size={12} />
                   </button>
                 )}
               </div>
-              <div
-                className={`input-container quad ${recoveryTimeError ? 'validation-error' : ''}`}
-              >
+              <div className={`input-container quad ${recoveryTimeError ? 'validation-error' : ''}`}>
                 <input
                   type="number"
                   className="input-field"
@@ -609,10 +482,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 />
                 <label className={isRateFactorDisabled ? 'disabled-label' : ''}>RCVT</label>
                 {!isRateFactorDisabled && (
-                  <button
-                    className="info-button"
-                    data-title={`${inputInfo.recoveryTime.name}: ${inputInfo.recoveryTime.range}`}
-                  >
+                  <button className="info-button" data-title={`${inputInfo.recoveryTime.name}: ${inputInfo.recoveryTime.range}`}>
                     <Info size={12} />
                   </button>
                 )}
@@ -628,10 +498,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 />
                 <label className={isRateFactorDisabled ? 'disabled-label' : ''}>RF</label>
                 {!isRateFactorDisabled && (
-                  <button
-                    className="info-button"
-                    data-title={`${inputInfo.rateFactor.name}: ${inputInfo.rateFactor.range}`}
-                  >
+                  <button className="info-button" data-title={`${inputInfo.rateFactor.name}: ${inputInfo.rateFactor.range}`}>
                     <Info size={12} />
                   </button>
                 )}
@@ -647,10 +514,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 />
                 <label className={isAvDelayDisabled ? 'disabled-label' : ''}>AVD</label>
                 {!isAvDelayDisabled && (
-                  <button
-                    className="info-button"
-                    data-title={`${inputInfo.avDelay.name}: ${inputInfo.avDelay.range}`}
-                  >
+                  <button className="info-button" data-title={`${inputInfo.avDelay.name}: ${inputInfo.avDelay.range}`}>
                     <Info size={12} />
                   </button>
                 )}
@@ -661,15 +525,13 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 <label className={`label-slider ${isRateFactorDisabled ? 'disabled' : ''}`}>
                   Activity Threshold
                 </label>
-                <div
-                  className={`input-container long ${activityThresholdError ? 'validation-error' : ''}`}
-                >
+                <div className={`input-container long ${activityThresholdError ? 'validation-error' : ''}`}>
                   <input
                     type="range"
                     className="input-field"
                     onChange={(e) => {
-                      handleInputChange(e)
-                      setActivityThreshold(e.target.value)
+                      handleInputChange(e);
+                      setActivityThreshold(e.target.value);
                     }}
                     disabled={isRateFactorDisabled}
                     value={isRateFactorDisabled ? '' : activityThreshold}
@@ -677,9 +539,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                     min="1"
                     max="7"
                   />
-                  <span className="slider-value">
-                    {isRateFactorDisabled ? '' : activityThresholdLabels[activityThreshold - 1]}
-                  </span>
+                  <span className="slider-value">{isRateFactorDisabled ? '' : activityThresholdLabels[activityThreshold - 1]}</span>
                 </div>
               </div>
             </div>
@@ -687,12 +547,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 
           {/* Submit and Discard Buttons */}
           <div className="button-container">
-            <button
-              className="submit-button"
-              type="button"
-              onClick={handleSubmit}
-              disabled={disableSubmit}
-            >
+            <button className="submit-button" type="button" onClick={handleSubmit}>
               <HardDriveUpload size={16} />
               <span>Submit</span>
             </button>
@@ -707,31 +562,19 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       {/* Reports */}
       {view === 'REPORTS' && (
         <div className="reports-container full-height">
-          {/*
           <button className="full-height-button electrogram-report" type="button">
             <span className="report-title">Electrogram Report</span>
             <span className="report-subtitle">Detailed tabular electrogram data</span>
           </button>
-          */}
-          <button
-            className="full-height-button parameter-log"
-            type="button"
-            onClick={downloadParameterLog}
-          >
+          <button className="full-height-button parameter-log" type="button" onClick={downloadParameterLog}>
             <span className="report-title">Parameter Log</span>
             <span className="report-subtitle">Full history of mode and parameter changes</span>
           </button>
-          {/*
           <button className="full-height-button serial-log" type="button">
             <span className="report-title">Serial Log</span>
             <span className="report-subtitle">Log of serial communication transmissions</span>
           </button>
-          */}
-          <button
-            className="full-height-button activity-log"
-            type="button"
-            onClick={downloadLoginHistory}
-          >
+          <button className="full-height-button activity-log" type="button" onClick={downloadLoginHistory}>
             <span className="report-title">Activity Log</span>
             <span className="report-subtitle">Full history of user account activity</span>
           </button>

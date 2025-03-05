@@ -13,7 +13,7 @@ export type Mode =
   | 'VOOR'
   | 'VVIR'
 
-export type ConnectionStatus = 'CONNECTED' | 'DISCONNECTED' | 'CONNECTING' | 'RECONNECTING'
+export type ConnectionStatus = 'CONNECTED' | 'DISCONNECTED' | 'CONNECTING'
 
 export type TelemetryStatus = 'ON' | 'OFF'
 
@@ -43,7 +43,6 @@ export interface User {
       ventricularRefractoryPeriod: number
       lowerRateLimit: number
       upperRateLimit: number
-      ventricularSenstivity: number
     }
     AAI: {
       atrialAmplitude: number
@@ -51,7 +50,6 @@ export interface User {
       atrialRefractoryPeriod: number
       lowerRateLimit: number
       upperRateLimit: number
-      atrialSensitivity: number
     }
     DDDR: {
       atrialAmplitude: number
@@ -67,8 +65,6 @@ export interface User {
       reactionTime: number
       recoveryTime: number
       activityThreshold: number
-      atrialSensitivity: number
-      ventricularSensitivity: number
     }
     DDD: {
       atrialAmplitude: number
@@ -80,8 +76,6 @@ export interface User {
       lowerRateLimit: number
       upperRateLimit: number
       avDelay: number
-      atrialSensitivity: number
-      ventricularSensitivity: number
     }
     AOOR: {
       atrialAmplitude: number
@@ -104,7 +98,6 @@ export interface User {
       reactionTime: number
       recoveryTime: number
       activityThreshold: number
-      atrialSensitivity: number
     }
     VOOR: {
       ventricularAmplitude: number
@@ -130,7 +123,6 @@ export interface User {
       reactionTime: number
       recoveryTime: number
       activityThreshold: number
-      ventricularSenstivity: number
     }
   }
   lastUsedMode?: Mode
@@ -163,7 +155,6 @@ export const createUser = (overrides: Partial<User> = {}): User =>
         ventricularRefractoryPeriod: 0,
         lowerRateLimit: 0,
         upperRateLimit: 0,
-        ventricularSenstivity: 0,
       },
       AAI: {
         atrialAmplitude: 0,
@@ -171,7 +162,6 @@ export const createUser = (overrides: Partial<User> = {}): User =>
         atrialRefractoryPeriod: 0,
         lowerRateLimit: 0,
         upperRateLimit: 0,
-        atrialSensitivity: 0,
       },
       DDDR: {
         atrialAmplitude: 0,
@@ -187,8 +177,6 @@ export const createUser = (overrides: Partial<User> = {}): User =>
         reactionTime: 0,
         recoveryTime: 0,
         activityThreshold: 4,
-        atrialSensitivity: 0,
-        ventricularSensitivity: 0,
       },
       DDD: {
         atrialAmplitude: 0,
@@ -200,8 +188,6 @@ export const createUser = (overrides: Partial<User> = {}): User =>
         lowerRateLimit: 0,
         upperRateLimit: 0,
         avDelay: 0,
-        atrialSensitivity: 0,
-        ventricularSensitivity: 0,
       },
       AOOR: {
         atrialAmplitude: 0,
@@ -224,7 +210,6 @@ export const createUser = (overrides: Partial<User> = {}): User =>
         reactionTime: 0,
         recoveryTime: 0,
         activityThreshold: 4,
-        atrialSensitivity: 0,
       },
       VOOR: {
         ventricularAmplitude: 0,
@@ -250,7 +235,6 @@ export const createUser = (overrides: Partial<User> = {}): User =>
         reactionTime: 0,
         recoveryTime: 0,
         activityThreshold: 4,
-        ventricularSenstivity: 0,
       },
     },
     lastUsedMode: 'OFF',
@@ -317,54 +301,4 @@ export interface Toast {
 export interface ChartPoint {
   x: number
   y: number
-}
-
-// interface for parameters to send to pacemaker
-export interface PacemakerParameters {
-  mode: Mode
-  lowerRateLimit: number
-  upperRateLimit: number
-  atrialRefractoryPeriod: number
-  ventricularRefractoryPeriod: number
-  atrialPulseWidth: number
-  ventricularPulseWidth: number
-  atrialAmplitude: number
-  ventricularAmplitude: number
-  atrialSensitivity: number
-  ventricularSensitivity: number
-  avDelay: number
-  rateFactor: number
-  activityThreshold: number
-  reactionTime: number
-  recoveryTime: number
-}
-
-// for IPC messages pertaining to serial
-export interface SerialResponse {
-  type: 'connection' | 'action' | 'data' | 'error'
-}
-
-export interface SerialConnectionResponse extends SerialResponse {
-  type: 'connection'
-  connectionType: 'initialize' | 'disconnect' | 'reconnect'
-  status: 'reconnecting' | 'success' | 'failed'
-  message?: string
-}
-
-export interface SerialActionResponse extends SerialResponse {
-  type: 'action'
-  action: 'send_parameters' | 'toggle_egram'
-  status: 'success' | 'error'
-  message?: string
-}
-
-export interface SerialDataResponse extends SerialResponse {
-  type: 'data'
-  dataType: 'egram' // only one for now
-  data: string
-}
-
-export interface SerialErrorResponse extends SerialResponse {
-  type: 'error'
-  error: string
 }
