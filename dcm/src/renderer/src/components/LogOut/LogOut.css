@@ -1,0 +1,24 @@
+@import '../../assets/main.css';
+
+.logout-button {
+  background: rgba(255, 255, 255, 0.075);
+  border-radius: 5px;
+  border: none;
+  color: rgba(238, 65, 65, 1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 0;
+  transition: ease-in-out 0.3s;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transition: ease-in-out 0.3s;
+}
+
+.logout-button svg {
+  margin-right: 8px;
+}

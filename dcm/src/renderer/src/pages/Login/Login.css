@@ -1,0 +1,153 @@
+@import '../../assets/main.css';
+
+.login-container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 40px;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 125%;
+  text-align: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  position: relative;
+  top: calc(100vh * (5 / 100));
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeIn 0.75s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.floating-label-group {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  background-color: rgba(217, 217, 217, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  font-family: inherit;
+  transition:
+    border 0.3s,
+    background-color 0.3s;
+}
+
+input:focus {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 3px solid transparent;
+  outline: 2px solid white;
+  outline-offset: 3px;
+}
+
+label {
+  position: absolute;
+  left: 12px;
+  top: 11px;
+  font-size: 14px;
+  pointer-events: none;
+  transition: all 0.2s ease-out;
+}
+
+input.filled + label {
+  top: -20px;
+  left: 8px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: inherit;
+}
+
+input:focus + label {
+  top: -23px;
+  left: 8px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 1);
+  font-family: inherit;
+}
+
+.back-button {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  background-color: transparent;
+  border: none;
+  color: var(--ev-button-alt-text);
+  padding: 0px 10px 0px 10px;
+  font-size: 18px;
+  line-height: 38px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: ease-in-out 0.3s;
+}
+
+.back-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  transition: ease-in-out 0.3s;
+}
+
+.login-button {
+  flex-shrink: 0;
+  padding: 6px;
+}
+
+.login-button a {
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  border: 1px solid white;
+  text-align: center;
+  font-weight: 600;
+  white-space: nowrap;
+  border-radius: 20px;
+  padding: 0 25px;
+  line-height: 38px;
+  font-size: 16px;
+  border-color: var(--ev-button-alt-border);
+  color: var(--ev-button-alt-text);
+  background-color: rgba(27, 27, 31, 0.8);
+}
+
+.login-button a:hover {
+  background-color: rgba(27, 27, 31, 1);
+}
+
+.text {
+  margin-top: 0px;
+}
+
+.test-button {
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  border: 1px solid white;
+  text-align: center;
+  font-weight: 600;
+  white-space: nowrap;
+  border-radius: 20px;
+  padding: 0 25px;
+  line-height: 38px;
+  font-size: 16px;
+  border-color: var(--ev-button-alt-border);
+  color: var(--ev-button-alt-text);
+  background-color: rgba(27, 27, 31, 0.8);
+}
