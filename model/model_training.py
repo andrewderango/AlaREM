@@ -88,7 +88,7 @@ def train_model(labelled_epochs_power_bands_df):
     axes[0, 0].legend(loc="lower right")
 
     # Precision-Recall Curve
-    axes[0, 1].plot(recall, precision, color='blue', lw=2, label='Precision-Recall curve (AUC = %0.3f)' % auc_pr)
+    axes[0, 1].plot(recall, precision, color='blue', lw=2, label='Precision-Recall Curve (AUC = %0.3f)' % auc_pr)
     axes[0, 1].set_xlabel('Recall')
     axes[0, 1].set_ylabel('Precision')
     axes[0, 1].set_title('Precision-Recall Curve')
@@ -102,18 +102,18 @@ def train_model(labelled_epochs_power_bands_df):
 
     # Metrics Table
     metrics_data = {
-        'Metric': ['Accuracy', 'ROC AUC', 'Precision', 'Recall', 'F1-score', 'Log Loss', 'AUC-PR', 'MCC'],
-        'Training': [round(train_accuracy, 4), round(train_roc_auc, 4), round(train_precision, 4), round(train_recall, 4), round(train_f1, 4), round(train_log_loss, 4), round(train_auc_pr, 4), round(train_mcc, 4)],
-        'Testing': [round(test_accuracy, 4), round(test_roc_auc, 4), round(test_precision, 4), round(test_recall, 4), round(test_f1, 4), round(test_log_loss, 4), round(test_auc_pr, 4), round(test_mcc, 4)],
+        'Metric': ['MCC', 'AUC-PR', 'F1-Score', 'ROC AUC', 'Log Loss', 'Precision', 'Recall', 'Accuracy'],
+        'Testing': [round(test_mcc, 4), round(test_auc_pr, 4), round(test_f1, 4), round(test_roc_auc, 4), round(test_log_loss, 4), round(test_precision, 4), round(test_recall, 4), round(test_accuracy, 4)],
+        'Training': [round(train_mcc, 4), round(train_auc_pr, 4), round(train_f1, 4), round(train_roc_auc, 4), round(train_log_loss, 4), round(train_precision, 4), round(train_recall, 4), round(train_accuracy, 4)],
         'GenRatio': [
-            round(test_accuracy / train_accuracy, 4),
+            round(test_mcc / train_mcc, 4),
+            round(test_auc_pr / train_auc_pr, 4),
+            round(test_f1 / train_f1, 4),
             round(test_roc_auc / train_roc_auc, 4),
+            round(test_log_loss / train_log_loss, 4),
             round(test_precision / train_precision, 4),
             round(test_recall / train_recall, 4),
-            round(test_f1 / train_f1, 4),
-            round(test_log_loss / train_log_loss, 4),
-            round(test_auc_pr / train_auc_pr, 4),
-            round(test_mcc / train_mcc, 4)
+            round(test_accuracy / train_accuracy, 4)
         ]
     }
     metrics_df = pd.DataFrame(metrics_data)
