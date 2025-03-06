@@ -72,32 +72,35 @@ def train_model(labelled_epochs_power_bands_df):
     print(f"Test Confusion Matrix:\n{test_conf_matrix}")
 
     fpr, tpr, _ = roc_curve(y_test, y_test_prob)
-    plt.figure()
-    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (AUC = %0.3f)' % test_roc_auc)
-    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('ROC Curve')
-    plt.legend(loc="lower right")
-    plt.show()
-
     precision, recall, _ = precision_recall_curve(y_test, y_test_prob)
     auc_pr = auc(recall, precision)
-    plt.figure()
-    plt.plot(recall, precision, color='blue', lw=2, label='Precision-Recall curve (AUC = %0.3f)' % auc_pr)
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
-    plt.title('Precision-Recall Curve')
-    plt.legend(loc="lower left")
-    plt.show()
 
-    plt.figure(figsize=(10, 7))
-    sns.heatmap(test_conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=['Other', 'N1 Sleep'], yticklabels=['Other', 'N1 Sleep'])
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
-    plt.title('Confusion Matrix')
+    fig, axes = plt.subplots(1, 3, figsize=(20, 6))
+
+    # ROC Curve
+    axes[0].plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (AUC = %0.3f)' % test_roc_auc)
+    axes[0].plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+    axes[0].set_xlim([0.0, 1.0])
+    axes[0].set_ylim([0.0, 1.05])
+    axes[0].set_xlabel('False Positive Rate')
+    axes[0].set_ylabel('True Positive Rate')
+    axes[0].set_title('ROC Curve')
+    axes[0].legend(loc="lower right")
+
+    # Precision-Recall Curve
+    axes[1].plot(recall, precision, color='blue', lw=2, label='Precision-Recall curve (AUC = %0.3f)' % auc_pr)
+    axes[1].set_xlabel('Recall')
+    axes[1].set_ylabel('Precision')
+    axes[1].set_title('Precision-Recall Curve')
+    axes[1].legend(loc="lower left")
+
+    # Confusion Matrix
+    sns.heatmap(test_conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=['Other', 'N1/N2 Sleep'], yticklabels=['Other', 'N1/N2 Sleep'], ax=axes[2], cbar=False)
+    axes[2].set_xlabel('Predicted')
+    axes[2].set_ylabel('Actual')
+    axes[2].set_title('Confusion Matrix')
+
+    plt.tight_layout()
     plt.show()
 
     return model
