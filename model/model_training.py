@@ -75,7 +75,7 @@ def train_model(labelled_epochs_power_bands_df):
     precision, recall, _ = precision_recall_curve(y_test, y_test_prob)
     auc_pr = auc(recall, precision)
 
-    fig, axes = plt.subplots(2, 2, figsize=(20, 12))
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
 
     # ROC Curve
     axes[0, 0].plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (AUC = %0.3f)' % test_roc_auc)
@@ -103,29 +103,35 @@ def train_model(labelled_epochs_power_bands_df):
     # Metrics Table
     metrics_data = {
         'Metric': ['Accuracy', 'ROC AUC', 'Precision', 'Recall', 'F1-score', 'Log Loss', 'AUC-PR', 'MCC'],
-        'Training': [train_accuracy, train_roc_auc, train_precision, train_recall, train_f1, train_log_loss, train_auc_pr, train_mcc],
-        'Testing': [test_accuracy, test_roc_auc, test_precision, test_recall, test_f1, test_log_loss, test_auc_pr, test_mcc],
-        'Generalization Ratio': [
-            test_accuracy / train_accuracy,
-            test_roc_auc / train_roc_auc,
-            test_precision / train_precision,
-            test_recall / train_recall,
-            test_f1 / train_f1,
-            test_log_loss / train_log_loss,
-            test_auc_pr / train_auc_pr,
-            test_mcc / train_mcc
+        'Training': [round(train_accuracy, 4), round(train_roc_auc, 4), round(train_precision, 4), round(train_recall, 4), round(train_f1, 4), round(train_log_loss, 4), round(train_auc_pr, 4), round(train_mcc, 4)],
+        'Testing': [round(test_accuracy, 4), round(test_roc_auc, 4), round(test_precision, 4), round(test_recall, 4), round(test_f1, 4), round(test_log_loss, 4), round(test_auc_pr, 4), round(test_mcc, 4)],
+        'GenRatio': [
+            round(test_accuracy / train_accuracy, 4),
+            round(test_roc_auc / train_roc_auc, 4),
+            round(test_precision / train_precision, 4),
+            round(test_recall / train_recall, 4),
+            round(test_f1 / train_f1, 4),
+            round(test_log_loss / train_log_loss, 4),
+            round(test_auc_pr / train_auc_pr, 4),
+            round(test_mcc / train_mcc, 4)
         ]
     }
     metrics_df = pd.DataFrame(metrics_data)
     axes[1, 1].axis('tight')
     axes[1, 1].axis('off')
-    table = axes[1, 1].table(cellText=metrics_df.values, colLabels=metrics_df.columns, cellLoc='center', loc='center')
+    table = axes[1, 1].table(cellText=metrics_df.values, colLabels=metrics_df.columns, cellLoc='center', loc='center', colColours=['#f2f2f2']*4)
     table.auto_set_font_size(False)
     table.set_fontsize(12)
     table.scale(1.2, 1.2)
+    for (i, j), cell in table.get_celld().items():
+        cell.set_edgecolor('black')
+        if i == 0:
+            cell.set_text_props(weight='bold', color='white')
+            cell.set_facecolor('#40466e')
+        cell.set_height(0.1)
     axes[1, 1].set_title('Metrics Summary')
 
-    plt.tight_layout()
+    plt.tight_layout(pad=3.0)
     plt.show()
 
     return model
