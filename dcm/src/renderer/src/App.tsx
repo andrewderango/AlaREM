@@ -39,7 +39,7 @@ function App(): JSX.Element {
                   <div className="text">
                     Welcome to <span className="react">AlaREM</span>
                   </div>
-                  <p className="tip">Empowering confidence and precision in pacemaker management</p>
+                  <p className="tip">Waking up ready.</p>
                   <div className="actions">
                     <div className="action">
                       <Link to="/login">Log In User</Link>
