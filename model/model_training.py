@@ -1,7 +1,7 @@
 import pandas as pd
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, precision_score, recall_score, f1_score, log_loss, confusion_matrix, precision_recall_curve, auc
+from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, precision_score, recall_score, f1_score, log_loss, confusion_matrix, precision_recall_curve, auc, matthews_corrcoef
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -14,9 +14,10 @@ def train_model(labelled_epochs_power_bands_df):
     label = 'sleep_stage'
 
     X = train_df[features]
-    y = train_df[label].apply(lambda x: 1 if x == '1' else 0)
+    y = train_df[label].apply(lambda x: 1 if x in ('1', '2') else 0)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
     model = xgb.XGBClassifier(objective='binary:logistic', n_estimators=100, learning_rate=0.1, max_depth=5)
     model.fit(X_train, y_train)
@@ -35,6 +36,7 @@ def train_model(labelled_epochs_power_bands_df):
     train_conf_matrix = confusion_matrix(y_train, y_train_pred)
     train_precision_lst, train_recall_lst, _ = precision_recall_curve(y_train, y_train_prob)
     train_auc_pr = auc(train_recall_lst, train_precision_lst)
+    train_mcc = matthews_corrcoef(y_train, y_train_pred)
 
     test_accuracy = accuracy_score(y_test, y_test_pred)
     test_roc_auc = roc_auc_score(y_test, y_test_prob)
@@ -45,6 +47,7 @@ def train_model(labelled_epochs_power_bands_df):
     test_conf_matrix = confusion_matrix(y_test, y_test_pred)
     test_precision_lst, test_recall_lst, _ = precision_recall_curve(y_test, y_test_prob)
     test_auc_pr = auc(test_recall_lst, test_precision_lst)
+    test_mcc = matthews_corrcoef(y_test, y_test_pred)
 
     print('-- TRAINING METRICS --')
     print(f"Train Accuracy: {train_accuracy}")
@@ -54,7 +57,9 @@ def train_model(labelled_epochs_power_bands_df):
     print(f"Train F1-score: {train_f1}")
     print(f"Train Log Loss: {train_log_loss}")
     print(f"Train AUC-PR: {train_auc_pr}")
+    print(f"Train MCC: {train_mcc}")
     print(f"Train Confusion Matrix:\n{train_conf_matrix}")
+
     print('\n-- TESTING METRICS --')
     print(f"Test Accuracy: {test_accuracy}")
     print(f"Test ROC AUC: {test_roc_auc}")
@@ -63,6 +68,7 @@ def train_model(labelled_epochs_power_bands_df):
     print(f"Test F1-score: {test_f1}")
     print(f"Test Log Loss: {test_log_loss}")
     print(f"Test AUC-PR: {test_auc_pr}")
+    print(f"Test MCC: {test_mcc}")
     print(f"Test Confusion Matrix:\n{test_conf_matrix}")
 
     fpr, tpr, _ = roc_curve(y_test, y_test_prob)
