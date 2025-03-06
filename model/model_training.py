@@ -104,7 +104,17 @@ def train_model(labelled_epochs_power_bands_df):
     metrics_data = {
         'Metric': ['Accuracy', 'ROC AUC', 'Precision', 'Recall', 'F1-score', 'Log Loss', 'AUC-PR', 'MCC'],
         'Training': [train_accuracy, train_roc_auc, train_precision, train_recall, train_f1, train_log_loss, train_auc_pr, train_mcc],
-        'Testing': [test_accuracy, test_roc_auc, test_precision, test_recall, test_f1, test_log_loss, test_auc_pr, test_mcc]
+        'Testing': [test_accuracy, test_roc_auc, test_precision, test_recall, test_f1, test_log_loss, test_auc_pr, test_mcc],
+        'Generalization Ratio': [
+            test_accuracy / train_accuracy,
+            test_roc_auc / train_roc_auc,
+            test_precision / train_precision,
+            test_recall / train_recall,
+            test_f1 / train_f1,
+            test_log_loss / train_log_loss,
+            test_auc_pr / train_auc_pr,
+            test_mcc / train_mcc
+        ]
     }
     metrics_df = pd.DataFrame(metrics_data)
     axes[1, 1].axis('tight')
