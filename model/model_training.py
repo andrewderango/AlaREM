@@ -75,30 +75,45 @@ def train_model(labelled_epochs_power_bands_df):
     precision, recall, _ = precision_recall_curve(y_test, y_test_prob)
     auc_pr = auc(recall, precision)
 
-    fig, axes = plt.subplots(1, 3, figsize=(20, 6))
+    fig, axes = plt.subplots(2, 2, figsize=(20, 12))
 
     # ROC Curve
-    axes[0].plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (AUC = %0.3f)' % test_roc_auc)
-    axes[0].plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-    axes[0].set_xlim([0.0, 1.0])
-    axes[0].set_ylim([0.0, 1.05])
-    axes[0].set_xlabel('False Positive Rate')
-    axes[0].set_ylabel('True Positive Rate')
-    axes[0].set_title('ROC Curve')
-    axes[0].legend(loc="lower right")
+    axes[0, 0].plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (AUC = %0.3f)' % test_roc_auc)
+    axes[0, 0].plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+    axes[0, 0].set_xlim([0.0, 1.0])
+    axes[0, 0].set_ylim([0.0, 1.05])
+    axes[0, 0].set_xlabel('False Positive Rate')
+    axes[0, 0].set_ylabel('True Positive Rate')
+    axes[0, 0].set_title('ROC Curve')
+    axes[0, 0].legend(loc="lower right")
 
     # Precision-Recall Curve
-    axes[1].plot(recall, precision, color='blue', lw=2, label='Precision-Recall curve (AUC = %0.3f)' % auc_pr)
-    axes[1].set_xlabel('Recall')
-    axes[1].set_ylabel('Precision')
-    axes[1].set_title('Precision-Recall Curve')
-    axes[1].legend(loc="lower left")
+    axes[0, 1].plot(recall, precision, color='blue', lw=2, label='Precision-Recall curve (AUC = %0.3f)' % auc_pr)
+    axes[0, 1].set_xlabel('Recall')
+    axes[0, 1].set_ylabel('Precision')
+    axes[0, 1].set_title('Precision-Recall Curve')
+    axes[0, 1].legend(loc="lower left")
 
     # Confusion Matrix
-    sns.heatmap(test_conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=['Other', 'N1/N2 Sleep'], yticklabels=['Other', 'N1/N2 Sleep'], ax=axes[2], cbar=False)
-    axes[2].set_xlabel('Predicted')
-    axes[2].set_ylabel('Actual')
-    axes[2].set_title('Confusion Matrix')
+    sns.heatmap(test_conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=['Other', 'N1/N2 Sleep'], yticklabels=['Other', 'N1/N2 Sleep'], ax=axes[1, 0], cbar=False)
+    axes[1, 0].set_xlabel('Predicted')
+    axes[1, 0].set_ylabel('Actual')
+    axes[1, 0].set_title('Confusion Matrix')
+
+    # Metrics Table
+    metrics_data = {
+        'Metric': ['Accuracy', 'ROC AUC', 'Precision', 'Recall', 'F1-score', 'Log Loss', 'AUC-PR', 'MCC'],
+        'Training': [train_accuracy, train_roc_auc, train_precision, train_recall, train_f1, train_log_loss, train_auc_pr, train_mcc],
+        'Testing': [test_accuracy, test_roc_auc, test_precision, test_recall, test_f1, test_log_loss, test_auc_pr, test_mcc]
+    }
+    metrics_df = pd.DataFrame(metrics_data)
+    axes[1, 1].axis('tight')
+    axes[1, 1].axis('off')
+    table = axes[1, 1].table(cellText=metrics_df.values, colLabels=metrics_df.columns, cellLoc='center', loc='center')
+    table.auto_set_font_size(False)
+    table.set_fontsize(12)
+    table.scale(1.2, 1.2)
+    axes[1, 1].set_title('Metrics Summary')
 
     plt.tight_layout()
     plt.show()
