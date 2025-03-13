@@ -4,50 +4,114 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, precision_score, recall_score, f1_score, log_loss, confusion_matrix, precision_recall_curve, auc, matthews_corrcoef
 import matplotlib.pyplot as plt
 import seaborn as sns
+from tqdm import tqdm
 
-def train_model(labelled_epochs_power_bands_df):
+def train_model(labelled_epochs_power_bands_df, train_type):
     train_df = labelled_epochs_power_bands_df.copy(deep=True)
-    train_df['person'] = train_df['epochId'].apply(lambda x: x.split('-')[1])
+    train_df['person'] = train_df['epochId'].apply(lambda x: x.split('-')[0][0] + x.split('-')[1])
     train_df = train_df[~train_df['sleep_stage'].isin(['N', '?', 'M'])]
 
     features = ['anterior_subdelta', 'anterior_delta', 'anterior_theta', 'anterior_alpha', 'anterior_beta', 'anterior_gamma']
     label = 'sleep_stage'
 
-    X = train_df[features]
-    y = train_df[label].apply(lambda x: 1 if x in ('1', '2') else 0)
+    if train_type == 'rapid':
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+        X = train_df[features]
+        y = train_df[label].apply(lambda x: 1 if x in ('1', '2') else 0)
 
-    model = xgb.XGBClassifier(objective='binary:logistic', n_estimators=100, learning_rate=0.1, max_depth=5)
-    model.fit(X_train, y_train)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-    y_train_pred = model.predict(X_train)
-    y_test_pred = model.predict(X_test)
-    y_train_prob = model.predict_proba(X_train)[:, 1]
-    y_test_prob = model.predict_proba(X_test)[:, 1]
+        model = xgb.XGBClassifier(objective='binary:logistic', n_estimators=100, learning_rate=0.1, max_depth=5)
+        model.fit(X_train, y_train)
 
-    train_accuracy = accuracy_score(y_train, y_train_pred)
-    train_roc_auc = roc_auc_score(y_train, y_train_prob)
-    train_precision = precision_score(y_train, y_train_pred)
-    train_recall = recall_score(y_train, y_train_pred)
-    train_f1 = f1_score(y_train, y_train_pred)
-    train_log_loss = log_loss(y_train, y_train_prob)
-    train_conf_matrix = confusion_matrix(y_train, y_train_pred)
-    train_precision_lst, train_recall_lst, _ = precision_recall_curve(y_train, y_train_prob)
-    train_auc_pr = auc(train_recall_lst, train_precision_lst)
-    train_mcc = matthews_corrcoef(y_train, y_train_pred)
+        y_train_pred = model.predict(X_train)
+        y_test_pred = model.predict(X_test)
+        y_train_prob = model.predict_proba(X_train)[:, 1]
+        y_test_prob = model.predict_proba(X_test)[:, 1]
 
-    test_accuracy = accuracy_score(y_test, y_test_pred)
-    test_roc_auc = roc_auc_score(y_test, y_test_prob)
-    test_precision = precision_score(y_test, y_test_pred)
-    test_recall = recall_score(y_test, y_test_pred)
-    test_f1 = f1_score(y_test, y_test_pred)
-    test_log_loss = log_loss(y_test, y_test_prob)
-    test_conf_matrix = confusion_matrix(y_test, y_test_pred)
-    test_precision_lst, test_recall_lst, _ = precision_recall_curve(y_test, y_test_prob)
-    test_auc_pr = auc(test_recall_lst, test_precision_lst)
-    test_mcc = matthews_corrcoef(y_test, y_test_pred)
+        train_accuracy = accuracy_score(y_train, y_train_pred)
+        train_roc_auc = roc_auc_score(y_train, y_train_prob)
+        train_precision = precision_score(y_train, y_train_pred)
+        train_recall = recall_score(y_train, y_train_pred)
+        train_f1 = f1_score(y_train, y_train_pred)
+        train_log_loss = log_loss(y_train, y_train_prob)
+        train_conf_matrix = confusion_matrix(y_train, y_train_pred)
+        train_precision_lst, train_recall_lst, _ = precision_recall_curve(y_train, y_train_prob)
+        train_auc_pr = auc(train_recall_lst, train_precision_lst)
+        train_mcc = matthews_corrcoef(y_train, y_train_pred)
+
+        test_accuracy = accuracy_score(y_test, y_test_pred)
+        test_roc_auc = roc_auc_score(y_test, y_test_prob)
+        test_precision = precision_score(y_test, y_test_pred)
+        test_recall = recall_score(y_test, y_test_pred)
+        test_f1 = f1_score(y_test, y_test_pred)
+        test_log_loss = log_loss(y_test, y_test_prob)
+        test_conf_matrix = confusion_matrix(y_test, y_test_pred)
+        test_precision_lst, test_recall_lst, _ = precision_recall_curve(y_test, y_test_prob)
+        test_auc_pr = auc(test_recall_lst, test_precision_lst)
+        test_mcc = matthews_corrcoef(y_test, y_test_pred)
+
+    elif train_type == 'cross_validation':
+        # train_df = train_df.sample(frac=0.05, random_state=42) ### DELETE THIS
+
+        # initialize lists to store metrics for each fold
+        train_metrics = {'accuracy': [], 'roc_auc': [], 'precision': [], 'recall': [], 'f1': [], 'log_loss': [], 'auc_pr': [], 'mcc': []}
+        test_metrics = {'accuracy': [], 'roc_auc': [], 'precision': [], 'recall': [], 'f1': [], 'log_loss': [], 'auc_pr': [], 'mcc': []}
+
+        # perform LOOCV variant
+        folds = 0
+        for person in tqdm(train_df['person'].unique()):
+            folds += 1
+            X_train = train_df[train_df['person'] != person][features]
+            y_train = train_df[train_df['person'] != person][label].apply(lambda x: 1 if x in ('1', '2') else 0)
+            X_test = train_df[train_df['person'] == person][features]
+            y_test = train_df[train_df['person'] == person][label].apply(lambda x: 1 if x in ('1', '2') else 0)
+
+            model = xgb.XGBClassifier(objective='binary:logistic', n_estimators=100, learning_rate=0.1, max_depth=5)
+            model.fit(X_train, y_train)
+
+            y_train_pred = model.predict(X_train)
+            y_test_pred = model.predict(X_test)
+            y_train_prob = model.predict_proba(X_train)[:, 1]
+            y_test_prob = model.predict_proba(X_test)[:, 1]
+
+            train_metrics['accuracy'].append(accuracy_score(y_train, y_train_pred))
+            train_metrics['roc_auc'].append(roc_auc_score(y_train, y_train_prob))
+            train_metrics['precision'].append(precision_score(y_train, y_train_pred))
+            train_metrics['recall'].append(recall_score(y_train, y_train_pred))
+            train_metrics['f1'].append(f1_score(y_train, y_train_pred))
+            train_metrics['log_loss'].append(log_loss(y_train, y_train_prob))
+            train_metrics['auc_pr'].append(auc(*precision_recall_curve(y_train, y_train_prob)[:2]))
+            train_metrics['mcc'].append(matthews_corrcoef(y_train, y_train_pred))
+
+            test_metrics['accuracy'].append(accuracy_score(y_test, y_test_pred))
+            test_metrics['roc_auc'].append(roc_auc_score(y_test, y_test_prob))
+            test_metrics['precision'].append(precision_score(y_test, y_test_pred))
+            test_metrics['recall'].append(recall_score(y_test, y_test_pred))
+            test_metrics['f1'].append(f1_score(y_test, y_test_pred))
+            test_metrics['log_loss'].append(log_loss(y_test, y_test_prob))
+            test_metrics['auc_pr'].append(auc(*precision_recall_curve(y_test, y_test_prob)[:2]))
+            test_metrics['mcc'].append(matthews_corrcoef(y_test, y_test_pred))
+
+        # Calculate average metrics
+        train_accuracy = sum(train_metrics['accuracy']) / folds
+        train_roc_auc = sum(train_metrics['roc_auc']) / folds
+        train_precision = sum(train_metrics['precision']) / folds
+        train_recall = sum(train_metrics['recall']) / folds
+        train_f1 = sum(train_metrics['f1']) / folds
+        train_log_loss = sum(train_metrics['log_loss']) / folds
+        train_auc_pr = sum(train_metrics['auc_pr']) / folds
+        train_mcc = sum(train_metrics['mcc']) / folds
+
+        test_accuracy = sum(test_metrics['accuracy']) / folds
+        test_roc_auc = sum(test_metrics['roc_auc']) / folds
+        test_precision = sum(test_metrics['precision']) / folds
+        test_recall = sum(test_metrics['recall']) / folds
+        test_f1 = sum(test_metrics['f1']) / folds
+        test_log_loss = sum(test_metrics['log_loss']) / folds
+        test_auc_pr = sum(test_metrics['auc_pr']) / folds
+        test_mcc = sum(test_metrics['mcc']) / folds
 
     print('-- TRAINING METRICS --')
     print(f"Train Accuracy: {train_accuracy}")
