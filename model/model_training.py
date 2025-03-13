@@ -53,11 +53,13 @@ def train_model(labelled_epochs_power_bands_df, train_type):
         test_mcc = matthews_corrcoef(y_test, y_test_pred)
 
     elif train_type == 'cross_validation':
-        # train_df = train_df.sample(frac=0.05, random_state=42) ### DELETE THIS
+        train_df = train_df.sample(frac=0.35, random_state=42) ### DELETE THIS
 
         # initialize lists to store metrics for each fold
         train_metrics = {'accuracy': [], 'roc_auc': [], 'precision': [], 'recall': [], 'f1': [], 'log_loss': [], 'auc_pr': [], 'mcc': []}
         test_metrics = {'accuracy': [], 'roc_auc': [], 'precision': [], 'recall': [], 'f1': [], 'log_loss': [], 'auc_pr': [], 'mcc': []}
+        train_conf_matrices = []
+        test_conf_matrices = []
 
         # perform LOOCV variant
         folds = 0
@@ -76,14 +78,21 @@ def train_model(labelled_epochs_power_bands_df, train_type):
             y_train_prob = model.predict_proba(X_train)[:, 1]
             y_test_prob = model.predict_proba(X_test)[:, 1]
 
+            precision, recall, _ = precision_recall_curve(y_train, y_train_prob)
+            recall, precision = zip(*sorted(zip(recall, precision)))
+            train_metrics['auc_pr'].append(auc(recall, precision))
+
             train_metrics['accuracy'].append(accuracy_score(y_train, y_train_pred))
             train_metrics['roc_auc'].append(roc_auc_score(y_train, y_train_prob))
             train_metrics['precision'].append(precision_score(y_train, y_train_pred))
             train_metrics['recall'].append(recall_score(y_train, y_train_pred))
             train_metrics['f1'].append(f1_score(y_train, y_train_pred))
             train_metrics['log_loss'].append(log_loss(y_train, y_train_prob))
-            train_metrics['auc_pr'].append(auc(*precision_recall_curve(y_train, y_train_prob)[:2]))
             train_metrics['mcc'].append(matthews_corrcoef(y_train, y_train_pred))
+
+            precision, recall, _ = precision_recall_curve(y_test, y_test_prob)
+            recall, precision = zip(*sorted(zip(recall, precision)))
+            test_metrics['auc_pr'].append(auc(recall, precision))
 
             test_metrics['accuracy'].append(accuracy_score(y_test, y_test_pred))
             test_metrics['roc_auc'].append(roc_auc_score(y_test, y_test_prob))
@@ -91,8 +100,10 @@ def train_model(labelled_epochs_power_bands_df, train_type):
             test_metrics['recall'].append(recall_score(y_test, y_test_pred))
             test_metrics['f1'].append(f1_score(y_test, y_test_pred))
             test_metrics['log_loss'].append(log_loss(y_test, y_test_prob))
-            test_metrics['auc_pr'].append(auc(*precision_recall_curve(y_test, y_test_prob)[:2]))
             test_metrics['mcc'].append(matthews_corrcoef(y_test, y_test_pred))
+
+            train_conf_matrices.append(confusion_matrix(y_train, y_train_pred))
+            test_conf_matrices.append(confusion_matrix(y_test, y_test_pred))
 
         # Calculate average metrics
         train_accuracy = sum(train_metrics['accuracy']) / folds
@@ -112,6 +123,10 @@ def train_model(labelled_epochs_power_bands_df, train_type):
         test_log_loss = sum(test_metrics['log_loss']) / folds
         test_auc_pr = sum(test_metrics['auc_pr']) / folds
         test_mcc = sum(test_metrics['mcc']) / folds
+
+        # Calculate average confusion matrices
+        train_conf_matrix = sum(train_conf_matrices)
+        test_conf_matrix = sum(test_conf_matrices)
 
     print('-- TRAINING METRICS --')
     print(f"Train Accuracy: {train_accuracy}")
