@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import useStore from '@renderer/store/mainStore'
-import { useToast } from '../../context/ToastContext'
-import { Activity, HardDriveUpload, ClipboardX, Info, XCircle } from 'lucide-react'
-import LeftSidebar from './LeftSidebar'
-import RightSidebar from './RightSidebar'
-import MainContent from './MainContent'
 import LogoutButton from '../../components/LogOut/LogOut'
 import './Dashboard.css'
+import { ChevronDown } from 'lucide-react'
 
 function Dashboard(): JSX.Element {
   const { username, days, earliestWakeTime, latestWakeTime, dispatch } = useStore()
@@ -75,17 +71,20 @@ function Dashboard(): JSX.Element {
           <div className="welcome-text">
             <div className="welcome-label">Welcome</div>
             <div 
-              className="username" 
+              className="username-wrapper" 
               onClick={handleUsernameClick}
-              style={{ cursor: 'pointer' }}
             >
-              {username}
+              <span className="username">{username}</span>
+              <ChevronDown size={16} className={`dropdown-icon ${isDropdownOpen ? 'open' : ''}`} />
             </div>
           </div>
           {isDropdownOpen && (
-            <div className="dropdown-menu">
-              <LogoutButton />
-            </div>
+            <>
+              <div className={`dropdown-backdrop ${isDropdownOpen ? 'show' : ''}`} />
+              <div className={`dropdown-card ${isDropdownOpen ? 'show' : ''}`}>
+                <LogoutButton />
+              </div>
+            </>
           )}
         </div>
       </div>

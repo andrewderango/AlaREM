@@ -75,6 +75,60 @@
   color: #fff;
 }
 
+.username-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dropdown-icon {
+  color: #666;
+  transition: transform 0.2s ease-out;
+}
+
+.dropdown-icon.open {
+  transform: rotate(180deg);
+}
+
+.dropdown-card {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 120px;
+  background: rgba(42, 42, 42, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 100px;
+  padding: 8px;
+}
+
+.dropdown-card button {
+  width: 100%;
+  background: transparent;
+  color: #ff3737;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  padding: 4px 8px;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.dropdown-card button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.user-menu {
+  position: relative;
+  z-index: 1000;
+}
+
 /* 3. Alarm Configuration Section */
 .alarm-config {
   background-color: rgba(255, 255, 255, 0.05);
