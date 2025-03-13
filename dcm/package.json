@@ -25,6 +25,7 @@
     "@electron-toolkit/utils": "^3.0.0",
     "argon2": "^0.41.1",
     "chart.js": "^4.4.5",
+    "date-fns": "^4.1.0",
     "electron-updater": "^6.3.9",
     "json2csv": "^6.0.0-alpha.2",
     "lucide-react": "^0.453.0",

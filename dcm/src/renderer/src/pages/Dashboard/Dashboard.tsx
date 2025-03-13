@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import useStore from '@renderer/store/mainStore'
 import LogoutButton from '../../components/LogOut/LogOut'
 import './Dashboard.css'
+import { format, subDays } from 'date-fns'
 import { ChevronDown } from 'lucide-react'
 
 function Dashboard(): JSX.Element {
@@ -23,11 +24,13 @@ function Dashboard(): JSX.Element {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [isDropdownOpen])
   
-  const [previousNights] = React.useState([
-    '01/03/2025',
-    '02/03/2025',
-    '03/03/2025',
-  ])
+  const [previousNights] = React.useState(() => {
+    const yesterday = subDays(new Date(), 1)
+    return Array.from({ length: 14 }, (_, i) => {
+      const date = subDays(yesterday, i)
+      return format(date, 'MM/dd/yyyy')
+    })
+  })
 
   // Toggle a day's "selected" state
   const handleDayToggle = (index: number) => {
