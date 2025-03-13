@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import useStore from '@renderer/store/mainStore'
 import { useToast } from '../../context/ToastContext'
 import { Activity, HardDriveUpload, ClipboardX, Info, XCircle } from 'lucide-react'
@@ -10,6 +10,23 @@ import './Dashboard.css'
 
 function Dashboard(): JSX.Element {
   const { username, days, earliestWakeTime, latestWakeTime, dispatch } = useStore()
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  
+  const handleUsernameClick = () => {
+    setIsDropdownOpen(!isDropdownOpen)
+  }
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isDropdownOpen && !(event.target as Element).closest('.user-menu')) {
+        setIsDropdownOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isDropdownOpen])
+  
   const [previousNights] = React.useState([
     '01/03/2025',
     '02/03/2025',
@@ -54,13 +71,23 @@ function Dashboard(): JSX.Element {
       {/* Header with logo and welcome text */}
       <div className="header">
         <div className="logo-circle">Logo</div>
-        <div className="welcome-text">
-          <div className="welcome-label">Welcome</div>
-          <div className="username">{username}</div>
+        <div className="user-menu">
+          <div className="welcome-text">
+            <div className="welcome-label">Welcome</div>
+            <div 
+              className="username" 
+              onClick={handleUsernameClick}
+              style={{ cursor: 'pointer' }}
+            >
+              {username}
+            </div>
+          </div>
+          {isDropdownOpen && (
+            <div className="dropdown-menu">
+              <LogoutButton />
+            </div>
+          )}
         </div>
-      </div>
-      <div className="logout-container">
-        <LogoutButton />
       </div>
 
       {/* Alarm Configuration */}
