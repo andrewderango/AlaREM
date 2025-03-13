@@ -41,7 +41,10 @@ function Dashboard(): JSX.Element {
       {/* Header with logo and welcome text */}
       <div className="header">
         <div className="logo-circle">Logo</div>
-        <div className="welcome-text">Welcome, {username}</div>
+        <div className="welcome-text">
+          <div className="welcome-label">Welcome</div>
+          <div className="username">{username}</div>
+        </div>
       </div>
 
       {/* Alarm Configuration */}

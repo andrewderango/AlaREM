@@ -51,9 +51,23 @@
 }
 
 .welcome-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  gap: 0px;
+}
+
+.welcome-label {
+  color: #666666;
+  font-size: 12px;
+  margin-bottom: -2px; 
+}
+
+.username {
   font-size: 1.2rem;
   font-weight: 600;
-  text-align: right;
+  color: #fff;
 }
 
 /* 3. Alarm Configuration Section */
