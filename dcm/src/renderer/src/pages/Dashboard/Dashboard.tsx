@@ -63,16 +63,16 @@ function Dashboard(): JSX.Element {
         </div>
 
         <div className="time-inputs">
+          <div className="time-label">Earliest Wakeup Time</div>
           <div className="time-input-row">
-            
             <input
               type="time"
               value={earliestWakeTime}
               onChange={(e) => setEarliestWakeTime(e.target.value)}
             />
           </div>
+          <div className="time-label">Latest Wakeup Time</div>
           <div className="time-input-row">
-            
             <input
               type="time"
               value={latestWakeTime}

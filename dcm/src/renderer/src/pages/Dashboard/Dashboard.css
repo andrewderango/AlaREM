@@ -108,10 +108,11 @@
   flex-direction: column;
   gap: 0.75rem;
 }
-.time-inputs label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 0.25rem;
+.time-label {
+  text-align: left;
+  margin-bottom: 0px;
+  color: #898989;
+  font-size: 14px;
 }
 .time-inputs input[type="time"] {
   background: #222;
