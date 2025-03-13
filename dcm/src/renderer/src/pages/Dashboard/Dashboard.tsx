@@ -1,66 +1,51 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import useStore from '@renderer/store/mainStore'
 import { useToast } from '../../context/ToastContext'
 import { Activity, HardDriveUpload, ClipboardX, Info, XCircle } from 'lucide-react'
 import LeftSidebar from './LeftSidebar'
 import RightSidebar from './RightSidebar'
 import MainContent from './MainContent'
+import LogoutButton from '../../components/LogOut/LogOut'
 import './Dashboard.css'
 
-interface DayConfig {
-  label: string
-  selected: boolean
-  earliestWake: string
-  latestWake: string
-}
-
 function Dashboard(): JSX.Element {
-  // Basic state for username, days of the week, earliest/latest times, and previous nights
-  const { username } = useStore()
-  const [days, setDays] = useState<DayConfig[]>([
-    { label: 'M', selected: false, earliestWake: '', latestWake: '' },
-    { label: 'T', selected: false, earliestWake: '', latestWake: '' },
-    { label: 'W', selected: false, earliestWake: '', latestWake: '' },
-    { label: 'T', selected: false, earliestWake: '', latestWake: '' },
-    { label: 'F', selected: false, earliestWake: '', latestWake: '' },
-    { label: 'S', selected: false, earliestWake: '', latestWake: '' },
-    { label: 'S', selected: false, earliestWake: '', latestWake: '' },
-  ])
-  const [earliestWakeTime, setEarliestWakeTime] = useState('')
-  const [latestWakeTime, setLatestWakeTime] = useState('')
-  const [previousNights, setPreviousNights] = useState([
+  const { username, days, earliestWakeTime, latestWakeTime, dispatch } = useStore()
+  const [previousNights] = React.useState([
     '01/03/2025',
     '02/03/2025',
     '03/03/2025',
   ])
 
-  // Toggle a day’s "selected" state
+  // Toggle a day's "selected" state
   const handleDayToggle = (index: number) => {
-    setDays((prevDays) =>
-      prevDays.map((day, i) => {
-        if (i === index) {
-          // If selecting a new day, load its saved times
-          if (!day.selected) {
-            setEarliestWakeTime(day.earliestWake)
-            setLatestWakeTime(day.latestWake)
-          }
-          return { ...day, selected: !day.selected }
+    const updatedDays = days.map((day, i) => {
+      if (i === index) {
+        if (!day.selected) {
+          dispatch({
+            type: 'UPDATE_WAKE_TIMES',
+            payload: {
+              earliestWake: day.earliestWake,
+              latestWake: day.latestWake
+            }
+          })
         }
-        // Deselect all other days
-        return { ...day, selected: false }
-      })
-    )
+        return { ...day, selected: !day.selected }
+      }
+      return { ...day, selected: false }
+    })
+    dispatch({ type: 'UPDATE_DAYS', payload: updatedDays })
   }
 
   // Save times when they change
   useEffect(() => {
     const selectedDayIndex = days.findIndex(day => day.selected)
     if (selectedDayIndex !== -1) {
-      setDays(prevDays => prevDays.map((day, i) => 
+      const updatedDays = days.map((day, i) => 
         i === selectedDayIndex 
           ? { ...day, earliestWake: earliestWakeTime, latestWake: latestWakeTime }
           : day
-      ))
+      )
+      dispatch({ type: 'UPDATE_DAYS', payload: updatedDays })
     }
   }, [earliestWakeTime, latestWakeTime])
 
@@ -73,6 +58,9 @@ function Dashboard(): JSX.Element {
           <div className="welcome-label">Welcome</div>
           <div className="username">{username}</div>
         </div>
+      </div>
+      <div className="logout-container">
+        <LogoutButton />
       </div>
 
       {/* Alarm Configuration */}
@@ -96,7 +84,13 @@ function Dashboard(): JSX.Element {
             <input
               type="time"
               value={earliestWakeTime}
-              onChange={(e) => setEarliestWakeTime(e.target.value)}
+              onChange={(e) => dispatch({
+                type: 'UPDATE_WAKE_TIMES',
+                payload: {
+                  earliestWake: e.target.value,
+                  latestWake: latestWakeTime
+                }
+              })}
               disabled={!days.some(day => day.selected)}
             />
           </div>
@@ -105,7 +99,13 @@ function Dashboard(): JSX.Element {
             <input
               type="time"
               value={latestWakeTime}
-              onChange={(e) => setLatestWakeTime(e.target.value)}
+              onChange={(e) => dispatch({
+                type: 'UPDATE_WAKE_TIMES',
+                payload: {
+                  earliestWake: earliestWakeTime,
+                  latestWake: e.target.value
+                }
+              })}
               disabled={!days.some(day => day.selected)}
             />
           </div>
@@ -124,4 +124,5 @@ function Dashboard(): JSX.Element {
     </div>
   )
 }
+
 export default Dashboard

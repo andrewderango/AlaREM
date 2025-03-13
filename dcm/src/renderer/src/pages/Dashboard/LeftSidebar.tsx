@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import HideEgramData from '../../components/HideEgram/HideEgram'
-import LogoutButton from '../../components/LogOut/LogOut'
 import useStore from '@renderer/store/mainStore'
 import { useToast } from '../../context/ToastContext'
 import alaremLogo from '../../assets/alarem.png'
@@ -83,9 +82,6 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ handleEgramHiding }) => {
         </div>
         <div className="egram-button-container">
           <HideEgramData />
-        </div>
-        <div className="logout-button-container">
-          <LogoutButton />
         </div>
       </div>
     </div>
