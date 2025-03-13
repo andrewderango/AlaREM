@@ -59,6 +59,7 @@
     "autoprefixer": "^10.4.20",
     "electron": "^31.6.0",
     "electron-builder": "^24.13.3",
+    "electron-reload": "^2.0.0-alpha.1",
     "electron-vite": "^2.3.0",
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.1",

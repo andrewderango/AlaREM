@@ -17,7 +17,6 @@ import type {
   LoginUserResponse,
   ModeSettingResponse,
 } from '../common/types'
-import { join, resolve } from 'path'
 import * as path from 'path'
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import { promises as fs } from 'fs'
@@ -26,6 +25,16 @@ import { parse } from 'json2csv'
 const parameterHistoryPath = resolve(__dirname, '../../parameterHistory.json')
 
 let pythonProcess: ReturnType<typeof spawn> | null = null
+
+if (is.dev) {
+  try {
+    require('electron-reload')(__dirname, {
+      electron: join(__dirname, '../../node_modules/electron')
+    })
+  } catch (err) {
+    console.log('Error setting up electron-reload:', err)
+  }
+}
 
 export const spawnPythonProcess = (
   pythonPath: string,
