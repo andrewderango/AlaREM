@@ -58,8 +58,8 @@ export const spawnPythonProcess = (
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: 400,
+    height: 810,
     resizable: false,
     show: false,
     autoHideMenuBar: true,

@@ -1,3 +1,4 @@
+/* Keep your existing imports and keyframes if you still need them */
 @import '../../assets/main.css';
 
 @keyframes fadeIn {
@@ -7,919 +8,120 @@
   }
 }
 
+/* 1. Basic container for the full screen */
 .dashboard-container {
-  display: flex;
   width: 100vw;
   height: 100vh;
   position: fixed;
   top: 0;
   left: 0;
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  color: #fff;
+  background-color: #111; /* Dark background */
+  background-size: cover; /* If you have a wave image, set it here */
+  background-repeat: no-repeat;
   opacity: 0;
   transform: translateY(-10px);
   animation: fadeIn 0.75s ease-out forwards;
-}
-.main-content-container {
-  width: 70%;
-  transition: width 0.3s ease;
-}
-
-.main-content-container.expanded {
-  width: 100%;
-}
-
-@keyframes beat {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-@keyframes realisticBeat {
-  0%,
-  5% {
-    transform: scale(1);
-  }
-  10%,
-  15% {
-    transform: scale(1.05);
-  }
-  17.5%,
-  20% {
-    transform: scale(1);
-  }
-  25%,
-  27.5% {
-    transform: scale(1.05);
-  }
-  30%,
-  100% {
-    transform: scale(1);
-  }
-}
-
-.pacemaker-heart {
-  display: block;
-  margin: 41.75px auto;
-  width: 550px;
-  height: auto;
-  padding: 10px;
-  animation: realisticBeat 2s infinite;
-  margin-bottom: 32.5px !important;
-}
-
-.pacemaker-heart-stop {
-  display: block;
-  margin: 41.75px auto;
-  width: 550px;
-  height: auto;
-  padding: 10px;
-  animation: realisticBeat 2s infinite;
-  margin-bottom: 32.5px !important;
-}
-
-/* .pacemaker-heart-stop {
-  display: block;
-  margin: 41.75px auto;
-  width: 550px;
-  height: auto;
-  padding: 10px;
-} */
-
-.sidebar {
-  width: 20%;
-  background-color: rgba(12, 12, 16, 0.8);
-  color: white;
-  padding: 15px;
+  overflow-y: auto; /* Allow vertical scrolling if needed */
+  padding: 2rem; /* Add some padding around the content */
   box-sizing: border-box;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
 }
 
-.right-sidebar {
-  width: 30%;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-  padding: 15px;
-  box-sizing: border-box;
-  backdrop-filter: blur(1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  /* align-items: center; */
-  justify-content: space-between;
-  position: fixed;
-  right: 0px;
-  height: 100%;
-  transition: transform 0.3s ease;
-}
-
-.right-sidebar.hidden {
-  transform: translateX(100%);
-}
-
-.right-sidebar.visible {
-  transform: translateX(0);
-}
-
-.toggle-sidebar-spot {
-  position: fixed;
-  top: 4%;
-  right: 30%;
-  background: rgba(27, 27, 31, 0.85);
-  border: none;
-  color: white;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 5px 0 0 5px;
-  transition: background 0.3s, right 0.3s;
-  z-index: 1000;
-}
-
-.toggle-sidebar-spot.hidden {
-  right: 0;
-}
-
-.toggle-sidebar-spot:hover {
-  background: rgba(27, 27, 31, 1);
-}
-
-hr {
-  border: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  margin-top: 20px;
-  margin-bottom: 5px;
-  width: 70%;
-  margin-left: 15%;
-}
-
-.help-button-container {
-  position: absolute;
-  top: 14px;
-  right: 12px;
-}
-
-.help-button {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.help-button:hover {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.help-popup {
-  position: absolute;
-  top: 335px;
-  right: 15px;
-  width: 550px;
-  background-color: rgba(12, 12, 16, 0.95);
-  color: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-}
-
-.help-popup h3 {
-  margin-top: 0;
-}
-
-.help-popup ul {
-  padding-left: 10px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.help-popup li {
-  margin-bottom: 5px;
-}
-
-.help-popup strong {
-  color: rgba(255, 255, 255, 1);
-}
-
-.help-popup h3 {
-  margin-bottom: 5px;
-}
-
-.logo-sidebar {
-  width: 70%;
-  height: auto;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  will-change: filter;
-  transition: filter 300ms;
-}
-
-.logo-sidebar:hover {
-  filter: drop-shadow(0 0 1.2em #ffffff33);
-}
-
-.welcome-header {
-  font-size: calc(1.4vw);
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.username {
-  font-size: calc(2.5vw);
-  font-weight: 900;
-  margin-top: -5px;
-}
-
-.current-date {
-  font-size: 14px;
-}
-
-.current-time {
-  font-size: 24px;
-  margin-bottom: 20px;
-}
-
-.communication-status {
+/* 2. Header Section (Logo + Welcome) */
+.header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 255, 0, 0.3);
-  padding: 5px;
-  width: 70%;
-  margin-left: 15%;
-  font-size: 14px;
-  gap: 5px;
+  padding: 16px; /* adjust as needed */
+  gap: 16px;
 }
 
-.activity-icon {
-  margin-right: 5px;
-  margin-left: -2.5px;
-}
-
-.disconnected {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 0, 0, 0.3);
-  padding: 5px;
-  width: 75%;
-  margin-left: 12.5%;
-  font-size: 14px;
-  gap: 5px;
-}
-
-.disconnected-icon {
-  margin-right: 5px;
-  margin-left: -2.5px;
-}
-
-.sidebar-section {
-  width: 100%;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.welcome-section {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  gap: -5px;
-}
-
-.communication-status-header {
-  font-size: 12px;
-  margin-bottom: 5px;
-}
-
-.sidebar-time {
-  width: 100%;
-  text-align: center;
-}
-
-.bottom-sidebar-components {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.sidebar-versions {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.4);
-  width: 100%;
-  text-align: center;
-}
-
-.logout-button-container,
-.egram-button-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.main-content {
-  width: 580px;
-  box-sizing: border-box;
-  margin-left: 10px;
-  transition: width 0.3s ease;
-}
-
-.main-content.expanded {
-  width: calc(580px + 350px + 10px);
-}
-
-.input-row {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 32px;
-  flex-wrap: wrap;
-}
-
-.input-container {
-  position: relative;
-}
-
-.input-container.double {
-  width: 48.5%;
-}
-
-.input-container.triple {
-  width: 31.5%;
-}
-
-.input-container.quad {
-  width: 23%;
-}
-
-.input-container.long {
-  width: 100%;
-}
-
-.input-container.validation-error .input-field {
-  outline: #f44336 1px solid;
-}
-
-.input-container.validation-error label {
-  color: #f44336;
-}
-
-.input-field {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 5px;
-  border: 1px solid transparent;
-  outline: 1px solid transparent;
-  outline-offset: 1px;
-  color: white;
-  padding: 10px;
-  width: 100%;
-  font-size: 16px;
-  transition: ease-in-out 0.3s;
-  text-align: center;
-}
-
-.input-field::placeholder {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  text-align: center;
-}
-
-.input-field:focus {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid transparent;
-  outline: 1px solid rgba(255, 255, 255, 0.9);
-  transition: ease-in-out 0.2s;
-}
-
-.input-field:disabled {
-  color: rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.025);
-  cursor: not-allowed;
-}
-
-.input-field:disabled::placeholder {
-  color: rgba(255, 255, 255, 0.125);
-}
-
-.input-field[type="range"] {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 5px;
-  outline: none;
-  transition: background 0.3s;
-}
-
-.input-field[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  background: rgba(255, 255, 255, 0.7);
+.logo-circle {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.input-field[type="range"]:disabled {
-  background: rgba(255, 255, 255, 0.025);
-  cursor: not-allowed;
-}
-
-.input-field[type="range"]:disabled::-webkit-slider-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  cursor: not-allowed
-}
-
-.slider-value {
-  position: absolute;
-  top: -20px;
-  right: 5px;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-label {
-  position: absolute;
-  left: 12px;
-  top: 10px;
-  font-size: 14px;
-  pointer-events: none;
-  transition: all 0.2s ease-out;
-  color: rgba(255, 255, 255, 0.7);
-  text-align: center;
-}
-
-.disabled-label {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.label-slider {
-  top: -10px;
-  left: 22px;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.label-slider.disabled {
-  color: rgba(255, 255, 255, 0.3);
-}
-
-input.filled + label {
-  top: -20px;
-  left: 8px;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-input:focus + label {
-  top: -23px;
-  left: 8px;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 1);
-}
-
-.button-row {
+  background: #444;
   display: flex;
-  justify-content: space-around;
-  width: 100%;
-  margin-top: 20px;
-}
-
-.mode-button {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 5px;
-  border: none;
-  color: white;
-  cursor: pointer;
-  padding: 15px 0px;
-  font-size: 14px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-  transition: ease-in-out 0.3s;
-}
-
-.mode-button:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transition: ease-in-out 0.3s;
-}
-
-.mode-button.selected {
-  background: linear-gradient(135deg, rgba(31, 138, 219, 0.6), rgba(244, 42, 140, 0.6));
+  align-items: center;
+  justify-content: center;
   font-weight: bold;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
-  transition: ease-in-out 0.3s;
+  color: #eee;
+  margin-right: auto; /* pushes the welcome text to the right */
 }
 
-.button-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 25px;
-}
-
-.submit-button {
-  background: rgba(27, 27, 31, 0.85);
-  border-radius: 5px;
-  border: none;
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 15px 30px;
-  transition: ease-in-out 0.3s;
-  font-size: 16px;
-  width: 100%;
-}
-
-.discard-button {
-  background: rgba(27, 27, 31, 0.85);
-  border-radius: 5px;
-  border: none;
-  color: rgba(238, 65, 65, 1);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 15px 20px;
-  transition: ease-in-out 0.3s;
-  font-size: 16px;
-}
-
-.submit-button:hover,
-.discard-button:hover {
-  background: rgba(27, 27, 31, 1);
-  transition: ease-in-out 0.3s;
-}
-
-.submit-button svg,
-.discard-button svg {
-  margin-right: 8px;
-}
-
-h2 {
-  font-weight: 900;
-  text-align: center;
-}
-
-h3 {
-  font-size: 18px;
+.welcome-text {
+  font-size: 1.2rem;
   font-weight: 600;
-  text-align: left;
-  margin-bottom: 10px;
-  margin-top: 10px;
+  text-align: right;
 }
 
-.electrogram-container {
-  margin-top: 15px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 5px;
-  padding: 20px 20px 10px 20px;
-  text-align: center;
-  color: white;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-}
-
-.electrogram {
-  margin-top: 15px;
-}
-
-.stats-container {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 26px;
-}
-
-.stat-box {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 5px;
-  padding: 20px;
-  text-align: center;
-  color: white;
-  width: 30%;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-}
-
-.stat-box h3 {
-  margin-bottom: 0px;
-  font-size: 16px;
-  font-weight: 450;
-  text-align: center;
-}
-
-.stat-box p {
-  font-size: 32px;
-  font-weight: bold;
-}
-
-.view-toggle {
-  display: flex;
-  justify-content: space-around;
-}
-
-.toggle-button {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: white;
-  cursor: pointer;
-  padding: 10px 20px;
-  font-size: 14px;
-  transition: ease-in-out 0.3s;
-}
-
-.toggle-button.selected {
-  background: linear-gradient(135deg, rgba(31, 138, 219, 0.6), rgba(244, 42, 140, 0.6));
-  font-weight: bold;
-  transition: ease-in-out 0.3s;
-}
-
-.toggle-button:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transition: ease-in-out 0.3s;
-}
-
-.menu-button-container {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-}
-
-.menu-button {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.menu-button:hover {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.menu-popup {
-  position: absolute;
-  top: 22px;
-  right: 5px;
-  background-color: rgba(12, 12, 16, 0.95);
-  color: white;
-  padding: 10px;
+/* 3. Alarm Configuration Section */
+.alarm-config {
+  background-color: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  width: 175px;
-  font-size: 14px;
+  padding: 1rem;
+  margin-bottom: 1rem;
 }
-
-.menu-item {
+.alarm-config h2 {
+  margin: 0 0 1rem;
+  font-weight: 700;
+}
+.days-of-week {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.day-btn {
+  width: 40px;
+  height: 40px;
   border: none;
-  color: white;
+  border-radius: 50%;
+  background-color: #333;
+  color: #fff;
+  font-weight: bold;
   cursor: pointer;
-  padding: 10px;
-  width: 100%;
-  text-align: center;
   transition: background 0.3s;
 }
-
-.menu-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 5px;
+.day-btn:hover {
+  background-color: #444;
 }
-
-.menu-item.selected {
-  background: linear-gradient(135deg, rgba(31, 138, 219, 0.6), rgba(244, 42, 140, 0.6));
-  font-weight: bold;
-  border-radius: 5px;
+.day-btn.selected {
+  background-color: #4caf50;
 }
-
-.header-with-help {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: -20px;
-}
-
-.button-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  width: 100%;
-}
-
-.real-time-chart {
-  margin: 20px auto;
-}
-
-.toggle-sidebar-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(27, 27, 31, 0.85);
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: background 0.3s;
-}
-
-.toggle-sidebar-button:hover {
-  background: rgba(27, 27, 31, 1);
-}
-
-.full-width-button:hover {
-  background: rgba(27, 27, 31, 1);
-  transition: ease-in-out 0.3s;
-}
-
-.full-width-button.electrogram-report {
-  background-image: url('../../assets/images/consult.jpg');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.1;
-}
-
-.full-width-button.parameter-log {
-  background-image: url('../../assets/images/consult2.jpg');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.1;
-}
-
-.full-width-button.serial-log {
-  background-image: url('../../assets/images/pacemaker.png');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.1;
-}
-
-.full-height-button {
-  width: 100%;
-  height: calc(100% / 3);
-  background: rgba(70, 70, 70, 0.8);
-  border-radius: 5px;
-  border: none;
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0px 0;
-  transition: ease-in-out 0.3s;
-  font-size: 24px;
-  font-weight: bold;
-  position: relative;
-}
-
-.full-height-button:hover {
-  background: rgba(80, 80, 80, 0.8);
-  transition: ease-in-out 0.3s;
-}
-
-.full-height-button.electrogram-report::before,
-.full-height-button.parameter-log::before,
-.full-height-button.serial-log::before,
-.full-height-button.activity-log::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  opacity: 0.10;
-  z-index: 0;
-  border-radius: 5px;
-}
-
-.full-height-button.electrogram-report::before {
-  background-image: url('../../assets/images/consult.jpg');
-}
-
-.full-height-button.parameter-log::before {
-  background-image: url('../../assets/images/consult2.jpg');
-}
-
-.full-height-button.serial-log::before {
-  background-image: url('../../assets/images/pacemaker.png');
-}
-
-.full-height-button.activity-log::before {
-  background-image: url('../../assets/images/computer.jpg');
-}
-
-.report-title {
-  position: absolute;
-  top: 32.5%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 24px;
-  font-weight: bold;
-  color: rgba(255, 255, 255, 1.0);
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-  z-index: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.report-subtitle {
-  position: absolute;
-  top: 55%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-  z-index: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.reports-container.full-height {
-  height: 92.5%;
+.time-inputs {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 0.75rem;
 }
-
-.activity-threshold-container {
-  position: relative;
+.time-inputs label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+.time-inputs input[type="time"] {
+  background: #222;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 4px;
   width: 100%;
 }
 
-.label-slider {
-  position: absolute;
-  top: -20px;
-  left: 5px;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
+/* 4. Previous Nights Section */
+.previous-nights {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
 }
-
-.info-button {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  position: absolute;
-  top: -18px;
-  right: -5px;
-  transition: color 0.1s;
-  position: relative;
+.previous-nights h2 {
+  margin: 0 0 1rem;
+  font-weight: 700;
 }
-
-.info-button:hover {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.info-button:hover::after {
-  content: attr(data-title);
-  position: absolute;
-  top: 15px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 14px;
-  white-space: nowrap;
-  z-index: 1000;
-}
-
-.info-button {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  position: absolute;
-  top: -18px;
-  right: -5px;
-  transition: color 0.3s;
-}
-
-.info-button:hover {
-  color: rgba(255, 255, 255, 0.4);
+.night-entry {
+  background-color: #222;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
 }
