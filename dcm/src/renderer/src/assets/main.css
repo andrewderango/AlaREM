@@ -58,7 +58,7 @@ code {
 }
 
 .text {
-  font-size: 28px;
+  font-size: 28px !important;
   color: var(--ev-c-text-1);
   font-weight: 700;
   line-height: 32px;
