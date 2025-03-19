@@ -4,6 +4,8 @@ import LogoutButton from '../../components/LogOut/LogOut'
 import './Dashboard.css'
 import { format, subDays } from 'date-fns'
 import { ChevronDown } from 'lucide-react'
+import photo1 from '../../assets/sleep-data/photo1.png'
+import photo2 from '../../assets/sleep-data/photo2.png'
 
 function Dashboard(): JSX.Element {
   const { username, days, earliestWakeTime, latestWakeTime, dispatch } = useStore()
@@ -75,6 +77,10 @@ function Dashboard(): JSX.Element {
       dispatch({ type: 'UPDATE_DAYS', payload: updatedDays })
     }
   }, [earliestWakeTime, latestWakeTime])
+
+  const getImageForNight = (index: number) => {
+    return index % 2 === 0 ? photo1 : photo2;
+  };
 
   return (
     <div className="dashboard-container">
@@ -173,10 +179,10 @@ function Dashboard(): JSX.Element {
             <button className="close-modal" onClick={closeImageModal}>×</button>
             <h3>{selectedNight}</h3>
             <img 
-              src={`../../assets/sleep-data/${selectedNight.replace(/\//g, '-')}.png`}
+              src={getImageForNight(previousNights.indexOf(selectedNight))}
               alt={`Sleep data for ${selectedNight}`}
               onError={(e) => {
-                e.currentTarget.src = '../../assets/placeholder-image.png'
+                e.currentTarget.src = photo1;
               }}
             />
           </div>
