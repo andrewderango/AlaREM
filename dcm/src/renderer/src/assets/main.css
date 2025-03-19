@@ -37,8 +37,10 @@ code {
 .logo {
   margin-bottom: 20px;
   -webkit-user-drag: none;
-  height: 128px;
-  width: 128px;
+  height: auto;
+  max-height: 200px;
+  width: auto;
+  max-width: 200px;
   will-change: filter;
   transition: filter 300ms;
 }

@@ -4,6 +4,7 @@ import LogoutButton from '../../components/LogOut/LogOut'
 import './Dashboard.css'
 import { format, subDays } from 'date-fns'
 import { ChevronDown } from 'lucide-react'
+import alaremLogo from '../../assets/alarem.png'
 import photo1 from '../../assets/sleep-data/photo1.png'
 import photo2 from '../../assets/sleep-data/photo2.png'
 
@@ -80,13 +81,15 @@ function Dashboard(): JSX.Element {
 
   const getImageForNight = (index: number) => {
     return index % 2 === 0 ? photo1 : photo2;
-  };
+  }; 
 
   return (
     <div className="dashboard-container">
       {/* Header with logo and welcome text */}
       <div className="header">
-        <div className="logo-circle">Logo</div>
+      <div className="logo-circle">
+        <img src={alaremLogo} alt="AlaREM Logo" />
+      </div>
         <div className="user-menu">
           <div className="welcome-text">
             <div className="welcome-label">Welcome</div>
