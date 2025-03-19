@@ -21,6 +21,9 @@ export default defineConfig({
       },
     },
     plugins: [react()],
+    build: {
+      assetsInlineLimit: 0,
+    },
     server: {
       hmr: true,
       watch: {
