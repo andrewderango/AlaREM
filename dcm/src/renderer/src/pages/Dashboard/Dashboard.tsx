@@ -8,7 +8,9 @@ import { ChevronDown } from 'lucide-react'
 function Dashboard(): JSX.Element {
   const { username, days, earliestWakeTime, latestWakeTime, dispatch } = useStore()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  
+  const [selectedNight, setSelectedNight] = useState<string | null>(null)
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false)
+
   const handleUsernameClick = () => {
     setIsDropdownOpen(!isDropdownOpen)
   }
@@ -31,6 +33,15 @@ function Dashboard(): JSX.Element {
       return format(date, 'MM/dd/yyyy')
     })
   })
+
+  const handleNightClick = (night: string) => {
+    setSelectedNight(night)
+    setIsImageModalOpen(true)
+  }
+
+  const closeImageModal = () => {
+    setIsImageModalOpen(false)
+  }
 
   // Toggle a day's "selected" state
   const handleDayToggle = (index: number) => {
@@ -145,11 +156,32 @@ function Dashboard(): JSX.Element {
       <div className="previous-nights">
         <h2>Previous Nights</h2>
         {previousNights.map((night, idx) => (
-          <div key={idx} className="night-entry">
+          <button 
+            key={idx} 
+            className="night-entry" 
+            onClick={() => handleNightClick(night)}
+          >
             {night}
-          </div>
+          </button>
         ))}
       </div>
+      
+      {/* Image Modal */}
+      {isImageModalOpen && selectedNight && (
+        <div className="modal-backdrop" onClick={closeImageModal}>
+          <div className="image-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="close-modal" onClick={closeImageModal}>×</button>
+            <h3>{selectedNight}</h3>
+            <img 
+              src={`../../assets/sleep-data/${selectedNight.replace(/\//g, '-')}.png`}
+              alt={`Sleep data for ${selectedNight}`}
+              onError={(e) => {
+                e.currentTarget.src = '../../assets/placeholder-image.png'
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
