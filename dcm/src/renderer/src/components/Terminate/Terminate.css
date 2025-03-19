@@ -1,0 +1,29 @@
+@import '../../assets/main.css';
+
+.terminate-button {
+  color: rgb(238, 65, 65);
+  background: rgba(255, 255, 255, 0.075);
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 0;
+  transition: ease-in-out 0.3s;
+}
+
+.terminate-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transition: ease-in-out 0.3s;
+}
+
+.terminate-button svg {
+  margin-right: 8px;
+}
+
+.terminate-button:disabled {
+  background: rgba(27, 27, 31, 0.5);
+  cursor: not-allowed;
+}

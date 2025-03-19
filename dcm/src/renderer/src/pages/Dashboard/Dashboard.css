@@ -1,0 +1,338 @@
+@import '../../assets/main.css';
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar Styles */
+.dashboard-container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background-color: transparent;
+}
+
+.dashboard-container::-webkit-scrollbar-button {
+  display: none;
+}
+
+.dashboard-container::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0;
+}
+
+.dashboard-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  transition: background 0.2s ease;
+  min-height: 40px;
+}
+
+.dashboard-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Firefox */
+.dashboard-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+/* 1. Basic container for the full screen */
+.dashboard-container {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  background-color: #111;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeIn 0.75s ease-out forwards;
+  overflow-y: auto; 
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* 2. Header Section (Logo + Welcome) */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  gap: 16px;
+}
+
+.logout-container {
+  margin-left: auto;
+  padding-right: 16px;
+}
+
+.logo-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: auto;
+  width: auto;
+  height: auto;
+  background: transparent;
+}
+
+.logo-circle img {
+  width: 55px;
+  height: auto;
+  object-fit: contain;
+}
+
+.welcome-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  gap: 0px;
+}
+
+.welcome-label {
+  color: #666666;
+  font-size: 12px;
+  margin-bottom: -2px; 
+}
+
+.username-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  transition: transform 0.1s ease;
+}
+
+.username-wrapper:active {
+  transform: scale(0.95);
+}
+
+.username {
+  position: relative;
+  transition: opacity 0.2s ease;
+}
+
+.username:after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.5);
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+  transform-origin: right;
+}
+
+.username-wrapper:hover .username:after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.dropdown-icon {
+  color: #666;
+  transition: transform 0.2s ease-out;
+}
+
+.dropdown-icon.open {
+  transform: rotate(180deg);
+}
+
+.dropdown-card {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 120px;
+  background: rgba(42, 42, 42, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 100px;
+  padding: 8px;
+}
+
+.dropdown-card button {
+  width: 100%;
+  background: transparent;
+  color: #ff3737;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  padding: 4px 8px;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.dropdown-card button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.user-menu {
+  position: relative;
+  z-index: 1000;
+}
+
+/* 3. Alarm Configuration Section */
+.alarm-config {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.alarm-config h2 {
+  margin: 0 0 1rem;
+  font-weight: 700;
+}
+.days-of-week {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.day-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background-color: #333;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.day-btn:hover {
+  background-color: #444;
+}
+.day-btn.selected {
+  background-color: #4caf50;
+}
+.time-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.time-label {
+  text-align: left;
+  margin-bottom: 0px;
+  color: #898989;
+  font-size: 14px;
+}
+.time-inputs input[type="time"] {
+  background: #222;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.time-inputs input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+/* 4. Previous Nights Section */
+.previous-nights {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+}
+.previous-nights h2 {
+  margin: 0 0 1rem;
+  font-weight: 700;
+}
+.night-entry {
+  background-color: #222;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  text-align: left;
+  width: 100%;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.night-entry:hover {
+  background-color: #333;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.image-modal img {
+  max-width: 100%;
+  max-height: 80vh;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
+  image-rendering: high-quality;
+}
+
+.image-modal {
+  background-color: rgba(34, 34, 34, 0.5);
+  backdrop-filter: blur(12px);
+  padding: 1.5rem;
+  border-radius: 12px;
+  max-width: 90%;
+  max-height: 90vh;
+  width: auto;
+  position: relative;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: auto;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.close-modal:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.image-modal h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  text-align: center;
+}
