@@ -8,7 +8,7 @@ function Register(): JSX.Element {
   // - username
   // - password
   // - password again for confirmation
-  // - pacemaker serial number
+  // - hardware serial number
   // - addToast function from the ToastProvider context
   // - navigate function from react router (for page navigation)
   const [username, setUsername] = useState('')
@@ -143,7 +143,7 @@ function Register(): JSX.Element {
           <label>Confirm Password</label>
         </div>
 
-        {/* Pacemaker Serial Number input field */}
+        {/* hardware Serial Number input field */}
         <div className="floating-label-group">
           <input
             type="text"
@@ -151,7 +151,7 @@ function Register(): JSX.Element {
             onChange={handleInputChange(setSerialNumber)}
             required
           />
-          <label>Pacemaker Serial Number</label>
+          <label>Hardware Serial Number</label>
         </div>
 
         {/* Register button */}
