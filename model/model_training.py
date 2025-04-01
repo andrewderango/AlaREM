@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, precision_score, recall_score, f1_score, log_loss, confusion_matrix, precision_recall_curve, auc, matthews_corrcoef
-from sklearn.svm import SVC
+from lightgbm import LGBMClassifier
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
@@ -19,10 +19,13 @@ def train_model(labelled_epochs_power_bands_df, train_type):
     features = ['anterior_subdelta', 'anterior_delta', 'anterior_theta', 'anterior_alpha', 'anterior_beta', 'anterior_gamma']
     label = 'sleep_stage'
 
-    model = SVC(
-        kernel='rbf',
-        probability=True,
-        C=1.0
+    model = LGBMClassifier(
+        boosting_type='gbdt',
+        num_leaves=31,
+        max_depth=-1,
+        learning_rate=0.1,
+        n_estimators=100,
+        objective='binary',
     )
 
     if train_type == 'rapid':
@@ -30,7 +33,7 @@ def train_model(labelled_epochs_power_bands_df, train_type):
         X = train_df[features]
         y = train_df[label].apply(lambda x: 1 if x in ('1', '2') else 0)
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.98)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
 
         model.fit(X_train, y_train)
 
