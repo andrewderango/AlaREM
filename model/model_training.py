@@ -2,6 +2,7 @@ import time
 import pandas as pd
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, precision_score, recall_score, f1_score, log_loss, confusion_matrix, precision_recall_curve, auc, matthews_corrcoef
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -16,7 +17,7 @@ def train_model(labelled_epochs_power_bands_df, train_type):
     features = ['anterior_subdelta', 'anterior_delta', 'anterior_theta', 'anterior_alpha', 'anterior_beta', 'anterior_gamma']
     label = 'sleep_stage'
 
-    model = xgb.XGBClassifier(objective='binary:logistic', n_estimators=100, learning_rate=0.1, max_depth=5)
+    model = LogisticRegression(max_iter=1000)
 
     if train_type == 'rapid':
 
