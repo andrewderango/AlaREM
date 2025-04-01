@@ -56,7 +56,7 @@ def train_model(labelled_epochs_power_bands_df, train_type):
         test_mcc = matthews_corrcoef(y_test, y_test_pred)
 
     elif train_type == 'cross_validation':
-        train_df = train_df.sample(frac=0.35, random_state=42) ### DELETE THIS
+        train_df = train_df.sample(frac=0.10, random_state=42) # 1.00 in production
 
         # initialize lists to store metrics for each fold
         train_metrics = {'accuracy': [], 'roc_auc': [], 'precision': [], 'recall': [], 'f1': [], 'log_loss': [], 'auc_pr': [], 'mcc': []}
