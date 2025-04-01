@@ -1,3 +1,4 @@
+import time
 import pandas as pd
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
@@ -7,6 +8,7 @@ import seaborn as sns
 from tqdm import tqdm
 
 def train_model(labelled_epochs_power_bands_df, train_type):
+    start_time = time.time()
     train_df = labelled_epochs_power_bands_df.copy(deep=True)
     train_df['person'] = train_df['epochId'].apply(lambda x: x.split('-')[0][0] + x.split('-')[1])
     train_df = train_df[~train_df['sleep_stage'].isin(['N', '?', 'M'])]
@@ -149,6 +151,20 @@ def train_model(labelled_epochs_power_bands_df, train_type):
     print(f"Test AUC-PR: {test_auc_pr}")
     print(f"Test MCC: {test_mcc}")
     print(f"Test Confusion Matrix:\n{test_conf_matrix}")
+
+    # Model performance summary metadata
+    print('\n -- MODEL PERFORMANCE SUMMARY --')
+    test_tp = test_conf_matrix[1][1]
+    test_tn = test_conf_matrix[0][0]
+    test_fp = test_conf_matrix[0][1]
+    test_fn = test_conf_matrix[1][0]
+    train_tp = train_conf_matrix[1][1]
+    train_tn = train_conf_matrix[0][0]
+    train_fp = train_conf_matrix[0][1]
+    train_fn = train_conf_matrix[1][0]
+    end_time = time.time()
+    training_time = end_time - start_time
+    print(f"{test_mcc}, {test_auc_pr}, {test_roc_auc}, {test_f1}, {test_precision}, {test_recall}, {test_log_loss}, {test_accuracy}, {test_tp}, {test_tn}, {test_fp}, {test_fn}, {train_mcc}, {train_auc_pr}, {train_roc_auc}, {train_f1}, {train_precision}, {train_recall}, {train_log_loss}, {train_accuracy}, {train_tp}, {train_tn}, {train_fp}, {train_fn}, {training_time}\n")
 
     fpr, tpr, _ = roc_curve(y_test, y_test_prob)
     precision, recall, _ = precision_recall_curve(y_test, y_test_prob)
