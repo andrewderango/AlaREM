@@ -16,6 +16,8 @@ def train_model(labelled_epochs_power_bands_df, train_type):
     features = ['anterior_subdelta', 'anterior_delta', 'anterior_theta', 'anterior_alpha', 'anterior_beta', 'anterior_gamma']
     label = 'sleep_stage'
 
+    model = xgb.XGBClassifier(objective='binary:logistic', n_estimators=100, learning_rate=0.1, max_depth=5)
+
     if train_type == 'rapid':
 
         X = train_df[features]
@@ -24,7 +26,6 @@ def train_model(labelled_epochs_power_bands_df, train_type):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-        model = xgb.XGBClassifier(objective='binary:logistic', n_estimators=100, learning_rate=0.1, max_depth=5)
         model.fit(X_train, y_train)
 
         y_train_pred = model.predict(X_train)
@@ -72,7 +73,6 @@ def train_model(labelled_epochs_power_bands_df, train_type):
             X_test = train_df[train_df['person'] == person][features]
             y_test = train_df[train_df['person'] == person][label].apply(lambda x: 1 if x in ('1', '2') else 0)
 
-            model = xgb.XGBClassifier(objective='binary:logistic', n_estimators=100, learning_rate=0.1, max_depth=5)
             model.fit(X_train, y_train)
 
             y_train_pred = model.predict(X_train)
