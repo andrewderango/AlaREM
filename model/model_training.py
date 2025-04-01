@@ -6,6 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, precision_score, recall_score, f1_score, log_loss, confusion_matrix, precision_recall_curve, auc, matthews_corrcoef
 from lightgbm import LGBMClassifier
+from sklearn.neural_network import MLPClassifier
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
@@ -19,13 +20,12 @@ def train_model(labelled_epochs_power_bands_df, train_type):
     features = ['anterior_subdelta', 'anterior_delta', 'anterior_theta', 'anterior_alpha', 'anterior_beta', 'anterior_gamma']
     label = 'sleep_stage'
 
-    model = LGBMClassifier(
-        boosting_type='gbdt',
-        num_leaves=31,
-        max_depth=-1,
-        learning_rate=0.1,
-        n_estimators=100,
-        objective='binary',
+    model = MLPClassifier(
+        hidden_layer_sizes=(256, 128, 64, 32),
+        activation='relu',
+        solver='adam',
+        learning_rate='adaptive',
+        max_iter=200,
     )
 
     if train_type == 'rapid':
