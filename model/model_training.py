@@ -3,6 +3,7 @@ import pandas as pd
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, precision_score, recall_score, f1_score, log_loss, confusion_matrix, precision_recall_curve, auc, matthews_corrcoef
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -17,14 +18,17 @@ def train_model(labelled_epochs_power_bands_df, train_type):
     features = ['anterior_subdelta', 'anterior_delta', 'anterior_theta', 'anterior_alpha', 'anterior_beta', 'anterior_gamma']
     label = 'sleep_stage'
 
-    model = LogisticRegression(max_iter=1000)
+    model = DecisionTreeClassifier(
+        max_depth=4,
+        min_samples_split=5,
+        min_samples_leaf=3,
+    )
 
     if train_type == 'rapid':
 
         X = train_df[features]
         y = train_df[label].apply(lambda x: 1 if x in ('1', '2') else 0)
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
         model.fit(X_train, y_train)
