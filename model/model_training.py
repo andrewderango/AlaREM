@@ -17,15 +17,22 @@ def train_model(labelled_epochs_power_bands_df, train_type):
     train_df['person'] = train_df['epochId'].apply(lambda x: x.split('-')[0][0] + x.split('-')[1])
     train_df = train_df[~train_df['sleep_stage'].isin(['N', '?', 'M'])]
 
-    features = ['anterior_subdelta', 'anterior_delta', 'anterior_theta', 'anterior_alpha', 'anterior_beta', 'anterior_gamma']
+    # features = ['anterior_subdelta', 'anterior_delta', 'anterior_theta', 'anterior_alpha', 'anterior_beta', 'anterior_gamma', 
+    #             'posterior_subdelta', 'posterior_delta', 'posterior_theta', 'posterior_alpha', 'posterior_beta', 'posterior_gamma',
+    #             'anterior_delta_ratio', 'posterior_delta_ratio', 'anterior_theta_ratio', 'posterior_theta_ratio',
+    #             'anterior_alpha_ratio', 'posterior_alpha_ratio', 'anterior_beta_ratio', 'posterior_beta_ratio',
+    #             'anterior_gamma_ratio', 'posterior_gamma_ratio']
+    features = ['anterior_subdelta', 'anterior_delta', 'anterior_theta', 'anterior_alpha', 'anterior_beta', 'anterior_gamma',
+                'posterior_subdelta', 'posterior_delta', 'posterior_theta', 'posterior_alpha', 'posterior_beta', 'posterior_gamma']
     label = 'sleep_stage'
 
-    model = MLPClassifier(
-        hidden_layer_sizes=(256, 128, 64, 32),
-        activation='relu',
-        solver='adam',
-        learning_rate='adaptive',
-        max_iter=200,
+    model = LGBMClassifier(
+        boosting_type='gbdt',
+        num_leaves=31,
+        max_depth=-1,
+        learning_rate=0.1,
+        n_estimators=100,
+        objective='binary',
     )
 
     if train_type == 'rapid':
