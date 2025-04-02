@@ -7,6 +7,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, precision_score, recall_score, f1_score, log_loss, confusion_matrix, precision_recall_curve, auc, matthews_corrcoef
 from lightgbm import LGBMClassifier
 from sklearn.neural_network import MLPClassifier
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, MaxAbsScaler
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
@@ -26,12 +27,15 @@ def train_model(labelled_epochs_power_bands_df, train_type):
                 'posterior_subdelta', 'posterior_delta', 'posterior_theta', 'posterior_alpha', 'posterior_beta', 'posterior_gamma']
     label = 'sleep_stage'
 
+    scaler = MaxAbsScaler()
+    train_df[features] = scaler.fit_transform(train_df[features])
+
     model = LGBMClassifier(
         boosting_type='gbdt',
-        num_leaves=431,
+        num_leaves=131,
         max_depth=-1,
         learning_rate=0.1,
-        n_estimators=1000,
+        n_estimators=375,
         objective='binary',
         reg_alpha=0.9,
         reg_lambda=0.1
