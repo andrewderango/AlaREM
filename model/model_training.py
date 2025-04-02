@@ -28,11 +28,13 @@ def train_model(labelled_epochs_power_bands_df, train_type):
 
     model = LGBMClassifier(
         boosting_type='gbdt',
-        num_leaves=31,
+        num_leaves=431,
         max_depth=-1,
         learning_rate=0.1,
-        n_estimators=100,
+        n_estimators=1000,
         objective='binary',
+        reg_alpha=0.9,
+        reg_lambda=0.1
     )
 
     if train_type == 'rapid':
