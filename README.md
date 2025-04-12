@@ -40,14 +40,13 @@ Waking up from deep sleep often leads to daytime fatigue and reduced cognitive p
 
 ### 🧪 Hardware
 - **Microcontroller**: STM32 (ARM Cortex-M series)
-- **EEG Acquisition Module**: [BioAmp EXG Pill](https://github.com/upsidedownlabs/BioAmp-EXG-Pill) with dual-channel electrode input
-    - **Sampling Rate**: 256 Hz
+- **EEG Acquisition Module**: [BioAmp EXG Pill](https://github.com/upsidedownlabs/BioAmp-EXG-Pill) with dual-channel electrode input at 256 Hz
 - **Communication**: UART serial connection to desktop
 
 ### 💻 Software
 - **Embedded Programming**: C++ (STM32 HAL)
 - **Signal Processing**: Fast Fourier Transform (FFT) and power band extraction (delta, theta, alpha, beta)
 - **ML Model**: Multi-Layer Perceptron (MLP) trained in Python
-- **Sleep Data**: EEG recordings from PhysioNet database (197 nights, 100 subjects)
+- **Sleep Training Data**: EEG recordings from [PhysioNet](https://physionet.org/content/sleep-edfx/1.0.0/) database (197 nights, 100 subjects) at 100 Hz
 - **Hyperparameter Tuning Framework**: Leave-One-Out Cross-Validation (LOOCV)
 - **Desktop Application**: Electron with Next.js
