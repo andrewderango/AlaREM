@@ -10,15 +10,16 @@ def compute_power_bands(signal, sampling_frequency):
 
     total_power = np.sum(fft_vals)
     power_bands = {
-        'subdelta': round(np.sum(fft_vals[freqs < 0.5]) / total_power, 5),
-        'delta': round(np.sum(fft_vals[(freqs >= 0.5) & (freqs < 4)]) / total_power, 5),
-        'theta': round(np.sum(fft_vals[(freqs >= 4) & (freqs < 8)]) / total_power, 5),
-        'alpha': round(np.sum(fft_vals[(freqs >= 8) & (freqs < 12)]) / total_power, 5),
-        'beta': round(np.sum(fft_vals[(freqs >= 12) & (freqs < 30)]) / total_power, 5),
-        'gamma': round(np.sum(fft_vals[(freqs >= 30)]) / total_power, 5)
+        'subdelta': np.sum(fft_vals[freqs < 0.5]),
+        'delta': np.sum(fft_vals[(freqs >= 0.5) & (freqs < 4)]),
+        'theta': np.sum(fft_vals[(freqs >= 4) & (freqs < 8)]),
+        'alpha': np.sum(fft_vals[(freqs >= 8) & (freqs < 12)]),
+        'beta': np.sum(fft_vals[(freqs >= 12) & (freqs < 30)]),
+        'gamma': np.sum(fft_vals[(freqs >= 30)]),
     }
+    power_ratios = {band: round(power / total_power, 5) for band, power in power_bands.items()}
     
-    return power_bands
+    return power_bands, power_ratios
 
 def load_edf_files(edf_files):
     for edf_file in edf_files:
@@ -59,13 +60,15 @@ def compute_power_bands_for_epochs(df, sampling_frequency):
         eeg_anterior = epoch_df['eegAnterior'].values
         eeg_posterior = epoch_df['eegPosterior'].values
 
-        power_bands_anterior = compute_power_bands(eeg_anterior, sampling_frequency)
-        power_bands_posterior = compute_power_bands(eeg_posterior, sampling_frequency)
+        power_bands_anterior, ratios_anterior = compute_power_bands(eeg_anterior, sampling_frequency)
+        power_bands_posterior, ratios_posterior = compute_power_bands(eeg_posterior, sampling_frequency)
 
         power_bands = {
             'epochId': epoch_id,
             **{f'anterior_{band}': power for band, power in power_bands_anterior.items()},
-            **{f'posterior_{band}': power for band, power in power_bands_posterior.items()}
+            **{f'posterior_{band}': power for band, power in power_bands_posterior.items()},
+            **{f'anterior_{band}_ratio': ratio for band, ratio in ratios_anterior.items()},
+            **{f'posterior_{band}_ratio': ratio for band, ratio in ratios_posterior.items()}
         }
         power_bands_list.append(power_bands)
 

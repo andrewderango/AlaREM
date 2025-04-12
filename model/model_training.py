@@ -2,7 +2,12 @@ import time
 import pandas as pd
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, precision_score, recall_score, f1_score, log_loss, confusion_matrix, precision_recall_curve, auc, matthews_corrcoef
+from lightgbm import LGBMClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, MaxAbsScaler
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
@@ -13,18 +18,33 @@ def train_model(labelled_epochs_power_bands_df, train_type):
     train_df['person'] = train_df['epochId'].apply(lambda x: x.split('-')[0][0] + x.split('-')[1])
     train_df = train_df[~train_df['sleep_stage'].isin(['N', '?', 'M'])]
 
-    features = ['anterior_subdelta', 'anterior_delta', 'anterior_theta', 'anterior_alpha', 'anterior_beta', 'anterior_gamma']
+    features = ['anterior_subdelta', 'anterior_delta', 'anterior_theta', 'anterior_alpha', 'anterior_beta', 'anterior_gamma', 
+                'posterior_subdelta', 'posterior_delta', 'posterior_theta', 'posterior_alpha', 'posterior_beta', 'posterior_gamma',
+                'anterior_delta_ratio', 'posterior_delta_ratio', 'anterior_theta_ratio', 'posterior_theta_ratio',
+                'anterior_alpha_ratio', 'posterior_alpha_ratio', 'anterior_beta_ratio', 'posterior_beta_ratio',
+                'anterior_gamma_ratio', 'posterior_gamma_ratio']
     label = 'sleep_stage'
 
-    model = xgb.XGBClassifier(objective='binary:logistic', n_estimators=100, learning_rate=0.1, max_depth=5)
+    scaler = MaxAbsScaler()
+    train_df[features] = scaler.fit_transform(train_df[features])
+
+    model = LGBMClassifier(
+        boosting_type='gbdt',
+        num_leaves=131,
+        max_depth=-1,
+        learning_rate=0.1,
+        n_estimators=375,
+        objective='binary',
+        reg_alpha=0.9,
+        reg_lambda=0.1
+    )
 
     if train_type == 'rapid':
 
         X = train_df[features]
         y = train_df[label].apply(lambda x: 1 if x in ('1', '2') else 0)
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
 
         model.fit(X_train, y_train)
 
@@ -56,7 +76,7 @@ def train_model(labelled_epochs_power_bands_df, train_type):
         test_mcc = matthews_corrcoef(y_test, y_test_pred)
 
     elif train_type == 'cross_validation':
-        train_df = train_df.sample(frac=0.35, random_state=42) ### DELETE THIS
+        train_df = train_df.sample(frac=0.10, random_state=42) # 1.00 in production
 
         # initialize lists to store metrics for each fold
         train_metrics = {'accuracy': [], 'roc_auc': [], 'precision': [], 'recall': [], 'f1': [], 'log_loss': [], 'auc_pr': [], 'mcc': []}
@@ -201,14 +221,14 @@ def train_model(labelled_epochs_power_bands_df, train_type):
         'Testing': [round(test_mcc, 4), round(test_auc_pr, 4), round(test_f1, 4), round(test_roc_auc, 4), round(test_log_loss, 4), round(test_precision, 4), round(test_recall, 4), round(test_accuracy, 4)],
         'Training': [round(train_mcc, 4), round(train_auc_pr, 4), round(train_f1, 4), round(train_roc_auc, 4), round(train_log_loss, 4), round(train_precision, 4), round(train_recall, 4), round(train_accuracy, 4)],
         'GenRatio': [
-            round(test_mcc / train_mcc, 4),
-            round(test_auc_pr / train_auc_pr, 4),
-            round(test_f1 / train_f1, 4),
-            round(test_roc_auc / train_roc_auc, 4),
-            round(test_log_loss / train_log_loss, 4),
-            round(test_precision / train_precision, 4),
-            round(test_recall / train_recall, 4),
-            round(test_accuracy / train_accuracy, 4)
+            round(test_mcc / train_mcc, 4) if train_mcc != 0 else 0,
+            round(test_auc_pr / train_auc_pr, 4) if train_auc_pr != 0 else 0,
+            round(test_f1 / train_f1, 4) if train_f1 != 0 else 0,
+            round(test_roc_auc / train_roc_auc, 4) if train_roc_auc != 0 else 0,
+            round(test_log_loss / train_log_loss, 4) if train_log_loss != 0 else 0,
+            round(test_precision / train_precision, 4) if train_precision != 0 else 0,
+            round(test_recall / train_recall, 4) if train_recall != 0 else 0,
+            round(test_accuracy / train_accuracy, 4) if train_accuracy != 0 else 0
         ]
     }
     metrics_df = pd.DataFrame(metrics_data)
